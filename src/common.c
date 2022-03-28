@@ -19,6 +19,7 @@
  */
 
 #include "common.h"
+#include "libbsd_string/string.h"
 #include <string.h>
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
@@ -111,10 +112,10 @@ void cgrf_destroy_terminate_glfw(GLFWwindow *window) {
   glfwTerminate();
 }
 
-void cgrf_parse_cmd_arguments(int argc, char **argv) {
+void cgrf_parse_cmd_arguments(int argc, char **argv, const char *optstring) {
   int option = -1;
 
-  while ((option = getopt(argc, argv, ":vhf:")) != -1) {
+  while ((option = getopt(argc, argv, optstring)) != -1) {
     switch (option) {
     case 'v':
       flag_version = 1;
@@ -124,29 +125,32 @@ void cgrf_parse_cmd_arguments(int argc, char **argv) {
       break;
     case 'f':
       flag_file = 1;
-      strncpy(file, optarg, MAX_FILE_NAME);
-      file[MAX_FILE_NAME - 1] = '\0';
+      strlcpy(file, optarg, sizeof(file));
       break;
     case ':':
       printf("Option %c needs a value\n", optopt);
-      return;
+      exit(EXIT_FAILURE);
     case '?':
       printf("Unknown option used: -%c, type -h to get help\n", optopt);
-      return;
+      exit(EXIT_FAILURE);
     default:
       break;
     }
   }
 
+  for (; optind < argc; optind++) {
+    printf("Unknown argument entered ( type -h to get help ): %s\n",
+           argv[optind]);
+    if (optind + 1 >= argc)
+      exit(EXIT_FAILURE);
+  }
   cgrf_handle_parsed_arguments();
-
-  for (; optind < argc; optind++)
-    printf("Extra argument entered ( SKIPPED ): %s\n", argv[optind]);
 }
 
 void cgrf_handle_parsed_arguments(void) {
   if (flag_version) {
     printf("CGRF_VERSION: v%d.%d\n", CGRF_MAJOR_VER, CGRF_MINOR_VER);
+    exit(EXIT_SUCCESS);
   }
 
   if (flag_help) {
@@ -156,6 +160,7 @@ void cgrf_handle_parsed_arguments(void) {
          "-v\tprint version\n"
          "-h\tprint help\n"
          "-f\tspecify file");
+    exit(EXIT_SUCCESS);
   }
 }
 

@@ -18,11 +18,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#include <stdio.h>
-
 #include "common.h"
 #include "global.h"
 #include "render.h"
+#include <stdio.h>
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -40,10 +39,7 @@ int main(int argc, char **argv) {
   static int width = 0, height = 0;
   static struct nk_colorf bg = {0.1f, 0.2f, 0.3f, 1.0f};
 
-  cgrf_parse_cmd_arguments(argc, argv);
-
-  if (flag_file)
-    printf("%s\n", file);
+  cgrf_parse_cmd_arguments(argc, argv, ":vhf:");
 
   GLFWwindow *win = cgrf_glfw_glad_init(800, 600, "CGRF GRAPH VISUALIZATION");
 

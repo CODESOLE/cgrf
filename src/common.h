@@ -21,12 +21,11 @@
 #ifndef _CGRF_COMMON_H_
 #define _CGRF_COMMON_H_
 
-#include <getopt.h>
-
 #include "debugbreak/debugbreak.h"
 #include "glad/glad.h"
 #include "global.h"
 #include <GLFW/glfw3.h>
+#include <getopt.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,8 +41,6 @@
 
 #define CGRF_MAJOR_VER 0
 #define CGRF_MINOR_VER 1
-
-void cgrf_parse_cmd_arguments(int argc, char **argv);
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
@@ -69,5 +66,7 @@ void cgrf_destroy_terminate_glfw(GLFWwindow *window);
 void cgrf_handle_parsed_arguments(void);
 
 void cgrf_handle_input(GLFWwindow *win);
+
+void cgrf_parse_cmd_arguments(int argc, char **argv, const char *optstring);
 
 #endif /* _CGRF_COMMON_H_ */
