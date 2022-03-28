@@ -1,0 +1,11 @@
+*~
+*.swp
+*.out
+.cc*
+/builddir
+/build
+.build*
+/coverage/*
+!/coverage/Makefile
+compile_commands.json
+/.cache

@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Debug",
+      "type": "shell",
+      "windows": { "command": "$(cygpath -m '${workspaceFolder}')/build.sh" },
+      "linux": { "command": "${workspaceFolder}/build.sh" },
+      "group": "build"
+    },
+    {
+      "label": "Release",
+      "type": "shell",
+      "windows": { "command": "$(cygpath -m '${workspaceFolder}')/build.sh r" },
+      "linux": { "command": "${workspaceFolder}/build.sh r" },
+      "group": "build"
+    }
+  ]
+}
