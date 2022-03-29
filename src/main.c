@@ -40,7 +40,6 @@
 int main(int argc, char **argv) {
   static struct nk_glfw glfw = {0};
   static int width = 0, height = 0;
-  static struct nk_colorf bg = {0.1f, 0.2f, 0.3f, 1.0f};
 
   cgrf_parse_cmd_arguments(argc, argv, ":vhf:");
 
@@ -53,8 +52,8 @@ int main(int argc, char **argv) {
   while (!glfwWindowShouldClose(win)) {
     nk_glfw3_new_frame(&glfw);
     cgrf_handle_input(win);
-    cgrf_gl_clear_color((float[4]){bg.r, bg.g, bg.b, bg.a});
-    cgrf_render_graph(ctx, &glfw, &bg);
+    cgrf_gl_clear_color((float[4]){0.1f, 0.1f, 0.1f, 1.0f});
+    cgrf_render_graph(ctx, &glfw);
     cgrf_glfw_routine(win, &width, &height);
   }
 

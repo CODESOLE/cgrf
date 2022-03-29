@@ -42,34 +42,119 @@
     (void)(expr);                                                              \
   } while (0)
 
-#define CGRF_MAJOR_VER 0
-#define CGRF_MINOR_VER 1
+#define CGRF_MAJOR_VER 0 /**< CGRF MAJOR VERSION */
+#define CGRF_MINOR_VER 1 /**< CGRF MINOR VERSION */
 
+/**
+ * @brief mouse callback for glfw
+ *
+ * @param window
+ * @param xpos
+ * @param ypos
+ */
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
+/**
+ * @brief scroll callback for glfw
+ *
+ * @param window
+ * @param xoffset
+ * @param yoffset
+ */
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
+/**
+ * @brief error callback for glfw
+ *
+ * @param error
+ * @param description
+ */
 void error_callback(int error, const char *description);
 
+/**
+ * @brief when window resized framebuffer callback for glfw
+ *
+ * @param window
+ * @param width
+ * @param height
+ */
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
+/**
+ * @brief key event callback for glfw
+ *
+ * @param window
+ * @param key
+ * @param scancode
+ * @param action
+ * @param mods
+ */
 void key_callback(GLFWwindow *window, int key, int scancode, int action,
                   int mods);
 
+/**
+ * @brief opengl clear color for framebuffer
+ *
+ * @param clear_color
+ */
 void cgrf_gl_clear_color(float clear_color[4]);
 
+/**
+ * @brief initial windows creation & opengl context creation
+ *
+ * @param width
+ * @param height
+ * @param window_name
+ * @return GLFWwindow*
+ */
 GLFWwindow *cgrf_glfw_glad_init(int width, int height, const char *window_name);
 
+/**
+ * @brief calculate aspect ratio
+ *
+ * @param window
+ * @param width
+ * @param height
+ * @return float
+ */
 float cgrf_calculate_ratio(GLFWwindow *window, int *width, int *height);
 
+/**
+ * @brief swap buffers, pollevents and viewport resize actions
+ *
+ * @param window
+ * @param width
+ * @param height
+ */
 void cgrf_glfw_routine(GLFWwindow *window, int *width, int *height);
 
+/**
+ * @brief window destroy
+ *
+ * @param window
+ */
 void cgrf_destroy_terminate_glfw(GLFWwindow *window);
 
+/**
+ * @brief handle parsed commandline args
+ *
+ */
 void cgrf_handle_parsed_arguments(void);
 
+/**
+ * @brief handle user input
+ *
+ * @param win
+ */
 void cgrf_handle_input(GLFWwindow *win);
 
+/**
+ * @brief parse command line arguments
+ *
+ * @param argc
+ * @param argv
+ * @param optstring
+ */
 void cgrf_parse_cmd_arguments(int argc, char **argv, const char *optstring);
 
 #endif /* _CGRF_COMMON_H_ */

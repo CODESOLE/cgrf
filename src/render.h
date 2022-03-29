@@ -35,13 +35,25 @@
 #include "nuklear/nuklear.h"
 #include "nuklear/nuklear_glfw_gl3.h"
 
-#define MAX_VERTEX_BUFFER 512 * 1024
-#define MAX_ELEMENT_BUFFER 128 * 1024
+#define MAX_VERTEX_BUFFER 512 * 1024  /**< maximum gui vertex buffer size */
+#define MAX_ELEMENT_BUFFER 128 * 1024 /**< maximum gui element buffer size */
 
+/**
+ * @brief set gui font
+ *
+ * @param ctx nuklear context
+ * @param glfw nuklear-glfw context
+ * @param file_name font file name
+ */
 void cgrf_set_font(struct nk_context *ctx, struct nk_glfw *glfw,
                    const char *file_name);
 
-void cgrf_render_graph(struct nk_context *ctx, struct nk_glfw *glfw,
-                       struct nk_colorf *bg);
+/**
+ * @brief graph render function
+ *
+ * @param ctx nuklear context
+ * @param glfw nuklear-glfw context
+ */
+void cgrf_render_graph(struct nk_context *ctx, struct nk_glfw *glfw);
 
 #endif /* _CGRF_RENDER_H */
