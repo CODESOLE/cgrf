@@ -9,3 +9,5 @@
 !/coverage/Makefile
 compile_commands.json
 /.cache
+/doc/*
+!/doc/doxygen-awesome-css
