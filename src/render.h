@@ -1,6 +1,8 @@
-/* render.h
- *
- * Copyright 2022 CODESOLE
+/**
+ * @file render.h
+ * @brief graph renderer definitions
+ * @author CODESOLE
+ * @copyright Copyright (c) 2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
+ *
  */
 
 #ifndef _CGRF_RENDER_H
