@@ -40,8 +40,7 @@
 int main(int argc, char **argv) {
   static struct nk_glfw glfw = {0};
   static int width = 0, height = 0;
-
-  cgrf_parse_cmd_arguments(argc, argv, ":vhf:");
+  cgrf_parse_cmd_arguments(argc, argv);
 
   GLFWwindow *win = cgrf_glfw_glad_init(800, 600, "CGRF GRAPH VISUALIZATION");
 

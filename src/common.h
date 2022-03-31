@@ -136,12 +136,6 @@ void cgrf_glfw_routine(GLFWwindow *window, int *width, int *height);
 void cgrf_destroy_terminate_glfw(GLFWwindow *window);
 
 /**
- * @brief handle parsed commandline args
- *
- */
-void cgrf_handle_parsed_arguments(void);
-
-/**
  * @brief handle user input
  *
  * @param win
@@ -155,6 +149,6 @@ void cgrf_handle_input(GLFWwindow *win);
  * @param argv
  * @param optstring
  */
-void cgrf_parse_cmd_arguments(int argc, char **argv, const char *optstring);
+void cgrf_parse_cmd_arguments(int argc, char **argv);
 
 #endif /* _CGRF_COMMON_H_ */

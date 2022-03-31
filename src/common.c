@@ -25,6 +25,15 @@
 #include "libbsd_string/string.h"
 #include <string.h>
 
+static inline void usage(void) {
+  puts("Usage: cgrf [OPTION...] [FILE...]\n"
+       "A simple graph visualization program\n"
+       "\n"
+       "--version           print version\n"
+       "--help              print help\n"
+       "--file [filename]   specify file\n");
+}
+
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   CGRF_UNUSED(window);
   CGRF_UNUSED(xpos);
@@ -115,55 +124,48 @@ void cgrf_destroy_terminate_glfw(GLFWwindow *window) {
   glfwTerminate();
 }
 
-void cgrf_parse_cmd_arguments(int argc, char **argv, const char *optstring) {
-  int option = -1;
+#define ARGS_FILE 0
+#define ARGS_HELP 1
+#define ARGS_VERSION 2
 
-  while ((option = getopt(argc, argv, optstring)) != -1) {
-    switch (option) {
-    case 'v':
+void cgrf_parse_cmd_arguments(int argc, char **argv) {
+  int opts = -1, option_index = 0;
+  static struct option longopts[] = {{"file", required_argument, 0, ARGS_FILE},
+                                     {"help", no_argument, 0, ARGS_HELP},
+                                     {"version", no_argument, 0, ARGS_VERSION},
+                                     {NULL, 0, NULL, 0}};
+
+  while ((opts = getopt_long(argc, argv, "", longopts, &option_index)) != -1) {
+    switch (opts) {
+    case ARGS_VERSION:
       flag_version = 1;
+      printf("VERSION: v%d.%d\n", CGRF_MAJOR_VER, CGRF_MINOR_VER);
+      exit(EXIT_SUCCESS);
       break;
-    case 'h':
-      flag_help = 1;
-      break;
-    case 'f':
+    case ARGS_FILE:
       flag_file = 1;
       strlcpy(file, optarg, sizeof(file));
+      printf("file to visualize: %s\n", file);
       break;
-    case ':':
-      printf("Option %c needs a value\n", optopt);
-      exit(EXIT_FAILURE);
+    case ARGS_HELP:
+      flag_help = 1;
+      usage();
+      exit(EXIT_SUCCESS);
+      break;
     case '?':
-      printf("Unknown option used: -%c, type -h to get help\n", optopt);
       exit(EXIT_FAILURE);
-    default:
       break;
+    default:
+      usage();
+      exit(EXIT_FAILURE);
     }
   }
 
   for (; optind < argc; optind++) {
-    printf("Unknown argument entered ( type -h to get help ): %s\n",
+    printf("Unknown argument entered ( type --help to get help ): %s\n",
            argv[optind]);
     if (optind + 1 >= argc)
       exit(EXIT_FAILURE);
-  }
-  cgrf_handle_parsed_arguments();
-}
-
-void cgrf_handle_parsed_arguments(void) {
-  if (flag_version) {
-    printf("CGRF_VERSION: v%d.%d\n", CGRF_MAJOR_VER, CGRF_MINOR_VER);
-    exit(EXIT_SUCCESS);
-  }
-
-  if (flag_help) {
-    puts("Usage: cgrf [OPTION...] [FILE...]\n"
-         "A simple graph visualization program\n"
-         "\n"
-         "-v\tprint version\n"
-         "-h\tprint help\n"
-         "-f\tspecify file");
-    exit(EXIT_SUCCESS);
   }
 }
 
