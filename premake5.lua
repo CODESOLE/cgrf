@@ -11,6 +11,7 @@ project "cgrf"
   targetname "cgrf"
   targetdir "build"
 
+  os.copyfile("tests/test.cgrf", "build")
   buildoptions { "-pedantic" }
   includedirs { "src", "dep" }
 
