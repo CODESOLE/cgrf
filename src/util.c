@@ -1,6 +1,6 @@
 /**
- * @file global.c
- * @brief global value declaration
+ * @file util.c
+ * @brief general utilities used around program implementation
  * @author CODESOLE
  * @copyright Copyright (c) 2022
  *
@@ -21,9 +21,21 @@
  *
  */
 
-#include "global.h"
+#include "util.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-_Bool flag_version = 0, flag_help = 0, flag_file = 0;
+size_t strnlength(const char *s, size_t n) {
+  const char *found = memchr(s, '\0', n);
+  return found ? (size_t)(found - s) : n;
+}
 
-#define MAX_FILE_NAME 128
-char file[MAX_FILE_NAME] = {0};
+char *strndup(const char *s, size_t n) {
+  size_t len = strnlength(s, n);
+  char *new = (char *)malloc(len + 1);
+  if (new == NULL)
+    return NULL;
+  new[len] = '\0';
+  return (char *)memcpy(new, s, len);
+}

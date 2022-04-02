@@ -23,7 +23,9 @@
 
 #include "common.h"
 #include "global.h"
+#include "parser.h"
 #include "render.h"
+#include "util.h"
 #include <stdio.h>
 
 #define NK_INCLUDE_FIXED_TYPES
@@ -38,7 +40,10 @@
 #include "nuklear/nuklear_glfw_gl3.h"
 
 int main(int argc, char **argv) {
-  static struct nk_glfw glfw = {0};
+  CGRF_UNUSED(argc);
+  CGRF_UNUSED(argv);
+  cgrf_parse_file("test.cgrf");
+  /*static struct nk_glfw glfw = {0};
   static int width = 0, height = 0;
   cgrf_parse_cmd_arguments(argc, argv);
 
@@ -57,7 +62,7 @@ int main(int argc, char **argv) {
   }
 
   nk_glfw3_shutdown(&glfw);
-  cgrf_destroy_terminate_glfw(win);
+  cgrf_destroy_terminate_glfw(win);*/
 
   return 0;
 }

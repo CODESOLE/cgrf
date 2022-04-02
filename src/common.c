@@ -1,6 +1,6 @@
 /**
  * @file common.c
- * @brief common function declerations
+ * @brief common function declaration
  * @author CODESOLE
  * @copyright Copyright (c) 2022
  *
@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "libbsd_string/string.h"
+#include "util.h"
 #include <string.h>
 
 static inline void usage(void) {

@@ -33,15 +33,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define CGRF_ASSERT(x)                                                         \
-  if (!(x))                                                                    \
-    debug_break();
-
-#define CGRF_UNUSED(expr)                                                      \
-  do {                                                                         \
-    (void)(expr);                                                              \
-  } while (0)
-
 #define CGRF_MAJOR_VER 0 /**< CGRF MAJOR VERSION */
 #define CGRF_MINOR_VER 1 /**< CGRF MINOR VERSION */
 
