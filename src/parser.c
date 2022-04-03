@@ -31,15 +31,10 @@
 #include <string.h>
 
 static char *trim_line(char *line) {
-  if (*line == '#') {
-    *line = '\0';
-    return line;
-  }
+  char *is_comment = strchr(line, '#');
+  if (is_comment)
+    *is_comment = '\0';
   while (*line != '\0' && *line != '\n') {
-    if (*line == '#') {
-      *line = '\0';
-      return line;
-    }
     if (isspace(*line))
       line++;
     else
@@ -88,7 +83,4 @@ void cgrf_parse_file(const char *filename) {
     for (size_t i = 0; i < kv_size(t); i++)
       kv_A(t, i) = trim_line(kv_A(t, i));
   }
-  puts("=====================FINAL======================");
-  for (size_t i = 0; i < kv_size(t); i++)
-    printf("final_string:%s@\n", kv_A(t, i));
 }
