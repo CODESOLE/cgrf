@@ -31,7 +31,15 @@
 #include <string.h>
 
 static char *trim_line(char *line) {
+  if (*line == '#') {
+    *line = '\0';
+    return line;
+  }
   while (*line != '\0' && *line != '\n') {
+    if (*line == '#') {
+      *line = '\0';
+      return line;
+    }
     if (isspace(*line))
       line++;
     else
@@ -62,7 +70,7 @@ static void tokenize(char *haystack, char *needle) {
     kv_push(char *, t, strndupl(rett, ret - rett));
     if (*(ret + 1) == '\0' || *(ret + 2) == '\0')
       break;
-    rett = ret + 2;
+    rett = ret + strlen(needle);
   }
 }
 
