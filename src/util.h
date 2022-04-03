@@ -30,7 +30,7 @@
 
 size_t strnlength(const char *s, size_t n);
 
-char *strndup(const char *s, size_t n);
+char *strndupl(const char *s, size_t n);
 
 #define CGRF_IF_NULL(p, message, file_name, line, action)                      \
   do {                                                                         \

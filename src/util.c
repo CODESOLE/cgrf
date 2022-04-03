@@ -31,7 +31,7 @@ size_t strnlength(const char *s, size_t n) {
   return found ? (size_t)(found - s) : n;
 }
 
-char *strndup(const char *s, size_t n) {
+char *strndupl(const char *s, size_t n) {
   size_t len = strnlength(s, n);
   char *new = (char *)malloc(len + 1);
   if (new == NULL)
