@@ -50,8 +50,10 @@ static char *trim_line(char *line) {
 
 static kvec_t(char *) t;
 static void tokenize(char *haystack, char *needle) {
+  if (strncmp(haystack, "", 1) == 0)
+    return;
   char *rett = haystack;
-  while (rett) {
+  while (rett && *rett != '\n') {
     char *ret = strstr(rett, needle);
     if (!ret || *rett == '\0') {
       kv_push(char *, t, strndupl(rett, strlen(rett)));
