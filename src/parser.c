@@ -51,6 +51,10 @@ static char *trim_line(char *line) {
   return line;
 }
 
+struct tokens {
+  size_t n, m;
+  char **a;
+};
 static kvec_t(char *) t;
 static void tokenize(char *haystack, char *needle) {
   if (strncmp(haystack, "", 1) == 0)
@@ -69,10 +73,14 @@ static void tokenize(char *haystack, char *needle) {
   }
 }
 
-void cgrf_parse_file(const char *filename) {
-  CGRF_IF_NULL(filename, "File name should not be NULL", __FILE__, __LINE__,
-               exit(EXIT_FAILURE));
+static inline _Bool check_extension(const char *filename) {
+  return strncmp(filename + strlen(filename) - 5, ".cgrf", 5) == 0 ? 0 : 1;
+}
 
+struct tokens *cgrf_parse_file(const char *filename) {
+  CGRF_ASSERT(filename, "File name should not be NULL", __FILE__, __LINE__);
+  CGRF_ASSERT(check_extension(filename) == 0,
+              "Extension of file should be .cgrf", __FILE__, __LINE__);
   FILE *f = NULL;
   CGRF_FOPEN(f, filename, "r", exit(EXIT_FAILURE));
 
@@ -83,4 +91,5 @@ void cgrf_parse_file(const char *filename) {
     for (size_t i = 0; i < kv_size(t); i++)
       kv_A(t, i) = trim_line(kv_A(t, i));
   }
+  return (struct tokens *)&t;
 }

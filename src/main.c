@@ -42,7 +42,8 @@
 int main(int argc, char **argv) {
   CGRF_UNUSED(argc);
   CGRF_UNUSED(argv);
-  cgrf_parse_file("test.cgrf");
+  struct tokens *toks = cgrf_parse_file("test.cgrf");
+  CGRF_UNUSED(toks);
   /*static struct nk_glfw glfw = {0};
   static int width = 0, height = 0;
   cgrf_parse_cmd_arguments(argc, argv);

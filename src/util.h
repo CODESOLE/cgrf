@@ -24,6 +24,7 @@
 #ifndef _CGRF_UTIL_H
 #define _CGRF_UTIL_H
 
+#include "debugbreak/debugbreak.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,14 +32,6 @@
 size_t strnlength(const char *s, size_t n);
 
 char *strndupl(const char *s, size_t n);
-
-#define CGRF_IF_NULL(p, message, file_name, line, action)                      \
-  do {                                                                         \
-    if (p == NULL) {                                                           \
-      fprintf(stderr, message " [%s::%d]\n", file_name, line);                 \
-      action;                                                                  \
-    }                                                                          \
-  } while (0)
 
 #define CGRF_FOPEN(f, file_name, modes, action)                                \
   do {                                                                         \
@@ -84,9 +77,11 @@ char *strndupl(const char *s, size_t n);
     p = NULL;                                                                  \
   } while (0)
 
-#define CGRF_ASSERT(x)                                                         \
-  if (!(x))                                                                    \
-    debug_break();
+#define CGRF_ASSERT(x, message, file_name, line)                               \
+  if (!(x)) {                                                                  \
+    fprintf(stderr, message " [%s::%d]\n", file_name, line);                   \
+    debug_break();                                                             \
+  }
 
 #define CGRF_UNUSED(expr)                                                      \
   do {                                                                         \

@@ -26,11 +26,13 @@
 
 #define MAX_CHAR 4096
 
+struct tokens;
+
 /**
  * @brief parse .cgrf file which will be visualize
  *
  * @param filename file to be parsed with the .cgrf extension
  */
-void cgrf_parse_file(const char *filename);
+struct tokens *cgrf_parse_file(const char *filename);
 
 #endif /* _PARSER_H_ */
