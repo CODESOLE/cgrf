@@ -7,7 +7,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/build/cgrf",
       "args": [],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}/build"
     },
     {
       "name": "Windows - Debug",

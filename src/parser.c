@@ -51,15 +51,13 @@ static char *trim_line(char *line) {
 static kvec_t(char *) t;
 static void tokenize(char *haystack, char *needle) {
   char *rett = haystack;
-  kv_init(t);
   while (rett) {
     char *ret = strstr(rett, needle);
     if (!ret || *rett == '\0') {
-      printf("string:%s\n", rett);
+      kv_push(char *, t, strndup(rett, strlen(rett)));
       break;
     }
     kv_push(char *, t, strndup(rett, ret - rett));
-    printf("string:%s@\n", kv_A(t, kv_size(t) - 1));
     if (*(ret + 1) == '\0' || *(ret + 2) == '\0')
       break;
     rett = ret + 2;
@@ -73,11 +71,12 @@ void cgrf_parse_file(const char *filename) {
   FILE *f = NULL;
   CGRF_FOPEN(f, filename, "r", exit(EXIT_FAILURE));
 
+  kv_init(t);
   char line[MAX_CHAR];
   while (!feof(f) && fgets(line, MAX_CHAR, f) != NULL) {
     tokenize(trim_line(line), "->");
     for (size_t i = 0; i < kv_size(t); i++)
-      trim_line(kv_A(t, i));
+      kv_A(t, i) = trim_line(kv_A(t, i));
   }
   puts("=====================FINAL======================");
   for (size_t i = 0; i < kv_size(t); i++)
