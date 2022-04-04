@@ -23,7 +23,6 @@
 
 #include "common.h"
 #include "global.h"
-#include "mlib/m-array.h"
 #include "parser.h"
 #include "render.h"
 #include "util.h"
