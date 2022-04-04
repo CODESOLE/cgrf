@@ -50,11 +50,6 @@ static char *trim_line(char *line) {
   return line;
 }
 
-struct tokens {
-  size_t n, m;
-  char **a;
-};
-
 static array_str_t t = ARRAY_INIT_VALUE();
 
 static void tokenize(char *haystack, char *needle) {
