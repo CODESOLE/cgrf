@@ -23,7 +23,6 @@
 
 #include "parser.h"
 #include "global.h"
-#include "klib/kvec.h"
 #include "util.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -55,7 +54,9 @@ struct tokens {
   size_t n, m;
   char **a;
 };
-static kvec_t(char *) t;
+
+static array_str_t t = ARRAY_INIT_VALUE();
+
 static void tokenize(char *haystack, char *needle) {
   if (strncmp(haystack, "", 1) == 0)
     return;
@@ -63,10 +64,10 @@ static void tokenize(char *haystack, char *needle) {
   while (rett && *rett != '\n') {
     char *ret = strstr(rett, needle);
     if (!ret || *rett == '\0') {
-      kv_push(char *, t, strndupl(rett, strlen(rett)));
+      array_str_push_back(t, strndupl(rett, strlen(rett)));
       break;
     }
-    kv_push(char *, t, strndupl(rett, ret - rett));
+    array_str_push_back(t, strndupl(rett, ret - rett));
     if (*(ret + 1) == '\0' || *(ret + 2) == '\0')
       break;
     rett = ret + strlen(needle);
@@ -77,19 +78,18 @@ static inline _Bool check_extension(const char *filename) {
   return strncmp(filename + strlen(filename) - 5, ".cgrf", 5) == 0 ? 0 : 1;
 }
 
-struct tokens *cgrf_parse_file(const char *filename) {
+struct array_str_s *cgrf_parse_file(const char *filename) {
   CGRF_ASSERT(filename, "File name should not be NULL", __FILE__, __LINE__);
   CGRF_ASSERT(check_extension(filename) == 0,
               "Extension of file should be .cgrf", __FILE__, __LINE__);
   FILE *f = NULL;
   CGRF_FOPEN(f, filename, "r", exit(EXIT_FAILURE));
 
-  kv_init(t);
   char line[MAX_CHAR];
   while (!feof(f) && fgets(line, MAX_CHAR, f) != NULL) {
     tokenize(trim_line(line), "->");
-    for (size_t i = 0; i < kv_size(t); i++)
-      kv_A(t, i) = trim_line(kv_A(t, i));
+    for (size_t i = 0; i < array_str_size(t); i++)
+      array_str_set_at(t, i, trim_line(*array_str_get(t, i)));
   }
-  return (struct tokens *)&t;
+  return t;
 }

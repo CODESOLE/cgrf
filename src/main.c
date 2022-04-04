@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "global.h"
+#include "mlib/m-array.h"
 #include "parser.h"
 #include "render.h"
 #include "util.h"
@@ -42,8 +43,12 @@
 int main(int argc, char **argv) {
   CGRF_UNUSED(argc);
   CGRF_UNUSED(argv);
-  struct tokens *toks = cgrf_parse_file("test.cgrf");
-  CGRF_UNUSED(toks);
+  struct array_str_s *toks = cgrf_parse_file("test.cgrf");
+
+  puts("=====================FINAL======================");
+  for (size_t i = 0; i < array_str_size(toks); i++)
+    printf("final_string:%s@\n", *array_str_get(toks, i));
+
   /*static struct nk_glfw glfw = {0};
   static int width = 0, height = 0;
   cgrf_parse_cmd_arguments(argc, argv);
