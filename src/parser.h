@@ -29,12 +29,11 @@ ARRAY_DEF(array_str, char *)
 
 #define MAX_CHAR 4096
 
-struct array_str_s;
-
 /**
  * @brief parse .cgrf file which will be visualize
  *
  * @param filename file to be parsed with the .cgrf extension
+ * @return struct array_str_s* tokenized strings
  */
 struct array_str_s *cgrf_parse_file(const char *filename);
 
