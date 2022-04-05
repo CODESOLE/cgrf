@@ -16,9 +16,9 @@ project "cgrf"
   includedirs { "src", "dep" }
 
   if os.host() == "windows" then
-    links { "glfw3", "opengl32" }
+    links { "SDL2main", "SDL2", "opengl32" }
   elseif os.host() == "linux" then
-    links { "glfw", "GL", "m" }
+    links { "SDL2main", "SDL2", "GL", "m" }
   end
 
   files { "src/**.c", "dep/**.c" }

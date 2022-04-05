@@ -27,7 +27,7 @@
 #include "debugbreak/debugbreak.h"
 #include "glad/glad.h"
 #include "global.h"
-#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h>
 #include <getopt.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -35,53 +35,6 @@
 
 #define CGRF_MAJOR_VER 0 /**< CGRF MAJOR VERSION */
 #define CGRF_MINOR_VER 1 /**< CGRF MINOR VERSION */
-
-/**
- * @brief mouse callback for glfw
- *
- * @param window
- * @param xpos
- * @param ypos
- */
-void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-
-/**
- * @brief scroll callback for glfw
- *
- * @param window
- * @param xoffset
- * @param yoffset
- */
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-
-/**
- * @brief error callback for glfw
- *
- * @param error
- * @param description
- */
-void error_callback(int error, const char *description);
-
-/**
- * @brief when window resized framebuffer callback for glfw
- *
- * @param window
- * @param width
- * @param height
- */
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-
-/**
- * @brief key event callback for glfw
- *
- * @param window
- * @param key
- * @param scancode
- * @param action
- * @param mods
- */
-void key_callback(GLFWwindow *window, int key, int scancode, int action,
-                  int mods);
 
 /**
  * @brief opengl clear color for framebuffer
@@ -96,9 +49,10 @@ void cgrf_gl_clear_color(float clear_color[4]);
  * @param width
  * @param height
  * @param window_name
- * @return GLFWwindow*
+ * @return SDL_Window*
  */
-GLFWwindow *cgrf_glfw_glad_init(int width, int height, const char *window_name);
+SDL_Window *cgrf_sdl_glad_init(SDL_GLContext *glContext, int width, int height,
+                               const char *window_name);
 
 /**
  * @brief calculate aspect ratio
@@ -108,7 +62,7 @@ GLFWwindow *cgrf_glfw_glad_init(int width, int height, const char *window_name);
  * @param height
  * @return float
  */
-float cgrf_calculate_ratio(GLFWwindow *window, int *width, int *height);
+float cgrf_calculate_ratio(SDL_Window *window, int *width, int *height);
 
 /**
  * @brief swap buffers, pollevents and viewport resize actions
@@ -117,21 +71,21 @@ float cgrf_calculate_ratio(GLFWwindow *window, int *width, int *height);
  * @param width
  * @param height
  */
-void cgrf_glfw_routine(GLFWwindow *window, int *width, int *height);
+void cgrf_sdl_routine(SDL_Window *window, int *width, int *height);
 
 /**
  * @brief window destroy
  *
  * @param window
  */
-void cgrf_destroy_terminate_glfw(GLFWwindow *window);
+void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext *glContext);
 
 /**
  * @brief handle user input
  *
  * @param win
  */
-void cgrf_handle_input(GLFWwindow *win);
+void cgrf_handle_input(SDL_Event *evt, _Bool *is_running);
 
 /**
  * @brief parse command line arguments

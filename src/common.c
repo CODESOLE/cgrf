@@ -26,6 +26,17 @@
 #include "util.h"
 #include <string.h>
 
+#define NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_STANDARD_IO
+#define NK_INCLUDE_STANDARD_VARARGS
+#define NK_INCLUDE_DEFAULT_ALLOCATOR
+#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
+#define NK_INCLUDE_FONT_BAKING
+#define NK_INCLUDE_DEFAULT_FONT
+#define NK_KEYSTATE_BASED_INPUT
+#include "nuklear/nuklear.h"
+#include "nuklear/nuklear_sdl_gl3.h"
+
 static inline void usage(void) {
   puts("Usage: cgrf [OPTION...] [FILE...]\n"
        "A simple graph visualization program\n"
@@ -35,94 +46,63 @@ static inline void usage(void) {
        "--file [filename]   specify file\n");
 }
 
-void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-  CGRF_UNUSED(window);
-  CGRF_UNUSED(xpos);
-  CGRF_UNUSED(ypos);
-}
-
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-  CGRF_UNUSED(window);
-  CGRF_UNUSED(xoffset);
-  CGRF_UNUSED(yoffset);
-}
-
-void error_callback(int error, const char *description) {
-  CGRF_UNUSED(error);
-  fprintf(stderr, "Error: %s\n", description);
-}
-
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-  CGRF_UNUSED(window);
-  glViewport(0, 0, width, height);
-}
-
-void key_callback(GLFWwindow *window, int key, int scancode, int action,
-                  int mods) {
-  CGRF_UNUSED(scancode);
-  CGRF_UNUSED(mods);
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
-}
-
 void cgrf_gl_clear_color(float clear_color[4]) {
   glClear(GL_COLOR_BUFFER_BIT);
   glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
 }
 
-GLFWwindow *cgrf_glfw_glad_init(int width, int height,
-                                const char *window_name) {
-  if (!glfwInit())
-    exit(EXIT_FAILURE);
+SDL_Window *cgrf_sdl_glad_init(SDL_GLContext *glContext, int width, int height,
+                               const char *window_name) {
+  SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
+  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
+                      SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  GLFWwindow *window = glfwCreateWindow(width, height, window_name, NULL, NULL);
+  SDL_Window *window = SDL_CreateWindow(
+      window_name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width,
+      height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
 
   if (!window) {
     perror("ERR::WINDOW::CREATION::FAILED");
-    glfwTerminate();
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     exit(EXIT_FAILURE);
   }
 
-  glfwMakeContextCurrent(window);
-  if (!gladLoadGL(glfwGetProcAddress)) {
+  glContext = SDL_GL_CreateContext(window);
+  CGRF_UNUSED(glContext);
+
+  if (!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress)) {
     perror("Failed to initialize GLAD");
     exit(EXIT_FAILURE);
   }
-
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-  glfwSetKeyCallback(window, key_callback);
-  glfwSetCursorPosCallback(window, mouse_callback);
-  glfwSetScrollCallback(window, scroll_callback);
-  glfwSetErrorCallback(error_callback);
 
   printf("Vendor:   %s\n", glGetString(GL_VENDOR));
   printf("Renderer: %s\n", glGetString(GL_RENDERER));
   printf("Version:  %s\n", glGetString(GL_VERSION));
 
-  glfwSwapInterval(1);
   return window;
 }
 
-float cgrf_calculate_ratio(GLFWwindow *window, int *width, int *height) {
-  glfwGetFramebufferSize(window, width, height);
+float cgrf_calculate_ratio(SDL_Window *window, int *width, int *height) {
+  SDL_GetWindowSize(window, width, height);
   return *width / (float)*height;
 }
 
-void cgrf_glfw_routine(GLFWwindow *window, int *width, int *height) {
-  glfwGetWindowSize(window, width, height);
+void cgrf_sdl_routine(SDL_Window *window, int *width, int *height) {
+  SDL_GetWindowSize(window, width, height);
   glViewport(0, 0, *width, *height);
-  glfwSwapBuffers(window);
-  glfwPollEvents();
+  SDL_GL_SwapWindow(window);
 }
 
-void cgrf_destroy_terminate_glfw(GLFWwindow *window) {
-  glfwDestroyWindow(window);
-  glfwTerminate();
+void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext *glContext) {
+  SDL_GL_DeleteContext(glContext);
+  SDL_DestroyWindow(window);
+  SDL_Quit();
 }
 
 #define ARGS_FILE 0
@@ -130,6 +110,10 @@ void cgrf_destroy_terminate_glfw(GLFWwindow *window) {
 #define ARGS_VERSION 2
 
 void cgrf_parse_cmd_arguments(int argc, char **argv) {
+  if (argc < 2) {
+    usage();
+    exit(EXIT_FAILURE);
+  }
   int opts = -1, option_index = 0;
   static struct option longopts[] = {{"file", required_argument, 0, ARGS_FILE},
                                      {"help", no_argument, 0, ARGS_HELP},
@@ -170,7 +154,10 @@ void cgrf_parse_cmd_arguments(int argc, char **argv) {
   }
 }
 
-void cgrf_handle_input(GLFWwindow *win) {
-  if (glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    glfwSetWindowShouldClose(win, GLFW_TRUE);
+void cgrf_handle_input(SDL_Event *evt, _Bool *is_running) {
+  while (SDL_PollEvent(evt)) {
+    if (evt->type == SDL_QUIT)
+      *is_running = 0;
+    nk_sdl_handle_event(evt);
+  }
 }

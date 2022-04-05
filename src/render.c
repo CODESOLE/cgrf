@@ -24,23 +24,22 @@
 #include "render.h"
 #include <stdio.h>
 
-void cgrf_set_font(struct nk_context *ctx, struct nk_glfw *glfw,
-                   const char *file_name) {
+void cgrf_set_font(struct nk_context *ctx, const char *file_name) {
   if (file_name == NULL) {
     struct nk_font_atlas *atlas;
-    nk_glfw3_font_stash_begin(glfw, &atlas);
-    nk_glfw3_font_stash_end(glfw);
+    nk_sdl_font_stash_begin(&atlas);
+    nk_sdl_font_stash_end();
   } else {
     struct nk_font_atlas *atlas;
-    nk_glfw3_font_stash_begin(glfw, &atlas);
+    nk_sdl_font_stash_begin(&atlas);
     struct nk_font *droid =
         nk_font_atlas_add_from_file(atlas, "DejaVuSans.ttf", 14, 0);
-    nk_glfw3_font_stash_end(glfw);
+    nk_sdl_font_stash_end();
     nk_style_set_font(ctx, &droid->handle);
   }
 }
 
-void cgrf_render_graph(struct nk_context *ctx, struct nk_glfw *glfw) {
+void cgrf_render_graph(struct nk_context *ctx) {
   /* GUI */
   if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
@@ -65,6 +64,5 @@ void cgrf_render_graph(struct nk_context *ctx, struct nk_glfw *glfw) {
   }
   nk_end(ctx);
 
-  nk_glfw3_render(glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER,
-                  MAX_ELEMENT_BUFFER);
+  nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
 }

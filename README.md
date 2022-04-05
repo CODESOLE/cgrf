@@ -14,6 +14,6 @@ For other linux distributions you can install dependencies according to your pac
  - GCC
  - GNU Make
  - Premake
- - GLFW
+ - SDL2
 
 Then just run `./build.sh` from root directory (No need for `./install_deps_for_windowsmsys2_and_arch_linux.sh` other than arch linux like distributions)

@@ -10,7 +10,7 @@
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_IMPLEMENTATION
 #define NK_KEYSTATE_BASED_INPUT
-#define NK_GLFW_GL3_IMPLEMENTATION
+#define NK_SDL_GL3_IMPLEMENTATION
 #define NK_GLFW_GL3_MOUSE_GRABBING
 #include "nuklear.h"
-#include "nuklear_glfw_gl3.h"
+#include "nuklear_sdl_gl3.h"

@@ -28,46 +28,37 @@
 #include "util.h"
 #include <stdio.h>
 
-#define NK_INCLUDE_FIXED_TYPES
-#define NK_INCLUDE_STANDARD_IO
-#define NK_INCLUDE_STANDARD_VARARGS
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
-#define NK_INCLUDE_FONT_BAKING
-#define NK_INCLUDE_DEFAULT_FONT
-#define NK_KEYSTATE_BASED_INPUT
-#include "nuklear/nuklear.h"
-#include "nuklear/nuklear_glfw_gl3.h"
-
 int main(int argc, char **argv) {
-  CGRF_UNUSED(argc);
-  CGRF_UNUSED(argv);
-  struct array_str_s *toks = cgrf_parse_file("test.cgrf");
-
-  puts("=====================FINAL======================");
-  for (size_t i = 0; i < array_str_size(toks); i++)
-    printf("final_string:%s@\n", *array_str_get(toks, i));
-
-  /*static struct nk_glfw glfw = {0};
+  /*   puts("=====================FINAL======================");
+    for (size_t i = 0; i < array_str_size(toks); i++)
+      printf("final_string:%s@\n", *array_str_get(toks, i)); */
+  struct array_str_s *toks = NULL;
   static int width = 0, height = 0;
+  _Bool is_running = 1;
+  SDL_GLContext gl_ctx = {0};
   cgrf_parse_cmd_arguments(argc, argv);
 
-  GLFWwindow *win = cgrf_glfw_glad_init(800, 600, "CGRF GRAPH VISUALIZATION");
+  if (flag_file)
+    toks = cgrf_parse_file(file);
+  else
+    exit(EXIT_FAILURE);
 
-  struct nk_context *ctx =
-      nk_glfw3_init(&glfw, win, NK_GLFW3_INSTALL_CALLBACKS);
-  cgrf_set_font(ctx, &glfw, NULL);
+  SDL_Window *win =
+      cgrf_sdl_glad_init(&gl_ctx, 800, 600, "CGRF GRAPH VISUALIZATION");
 
-  while (!glfwWindowShouldClose(win)) {
-    nk_glfw3_new_frame(&glfw);
-    cgrf_handle_input(win);
+  struct nk_context *ctx = nk_sdl_init(win);
+  cgrf_set_font(ctx, NULL);
+
+  SDL_Event evt;
+  while (is_running) {
+    cgrf_handle_input(&evt, &is_running);
     cgrf_gl_clear_color((float[4]){0.1f, 0.1f, 0.1f, 1.0f});
-    cgrf_render_graph(ctx, &glfw);
-    cgrf_glfw_routine(win, &width, &height);
+    cgrf_render_graph(ctx);
+    cgrf_sdl_routine(win, &width, &height);
   }
-
-  nk_glfw3_shutdown(&glfw);
-  cgrf_destroy_terminate_glfw(win);*/
+  nk_sdl_shutdown();
+  cgrf_destroy_terminate_sdl(win, gl_ctx);
+  array_str_clear(toks);
 
   return 0;
 }
