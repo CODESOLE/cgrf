@@ -41,17 +41,21 @@ struct nk_context;
 /**
  * @brief opengl clear color for framebuffer
  *
- * @param clear_color
+ * @param r red color
+ * @param g green color
+ * @param b blue color
+ * @param a alpha color
  */
 void cgrf_gl_clear_color(float r, float g, float b, float a);
 
 /**
  * @brief initial windows creation & opengl context creation
  *
- * @param width
- * @param height
- * @param window_name
- * @return SDL_Window*
+ * @param glContext OpenGL context
+ * @param width initial window width
+ * @param height initial window height
+ * @param window_name window name
+ * @return SDL_Window* window handle
  */
 SDL_Window *cgrf_sdl_glad_init(SDL_GLContext *glContext, int width, int height,
                                const char *window_name);
@@ -79,13 +83,16 @@ void cgrf_sdl_routine(SDL_Window *window, int *width, int *height);
  * @brief window destroy
  *
  * @param window
+ * @param glContext OpenGL context
  */
 void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext *glContext);
 
 /**
  * @brief handle user input
  *
- * @param win
+ * @param ctx nuklear context
+ * @param evt SDL event
+ * @param is_running should window open
  */
 void cgrf_handle_input(struct nk_context *ctx, SDL_Event *evt,
                        _Bool *is_running);
@@ -95,7 +102,6 @@ void cgrf_handle_input(struct nk_context *ctx, SDL_Event *evt,
  *
  * @param argc
  * @param argv
- * @param optstring
  */
 void cgrf_parse_cmd_arguments(int argc, char **argv);
 

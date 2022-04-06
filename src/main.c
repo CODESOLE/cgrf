@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
       printf("final_string:%s@\n", *array_str_get(toks, i)); */
   struct array_str_s *toks = NULL;
   static int width = 0, height = 0;
-  _Bool is_running = 1;
+  static _Bool is_running = 1;
   SDL_GLContext gl_ctx = {0};
   cgrf_parse_cmd_arguments(argc, argv);
 
