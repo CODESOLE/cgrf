@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char *trim_line(char *line) {
+static char *_trim_line(char *line) {
   char *is_comment = strchr(line, '#');
   if (is_comment)
     *is_comment = '\0';
@@ -52,7 +52,7 @@ static char *trim_line(char *line) {
 
 static array_str_t t = ARRAY_INIT_VALUE();
 
-static void tokenize(char *haystack, char *needle) {
+static void _tokenize(char *haystack, char *needle) {
   if (strncmp(haystack, "", 1) == 0)
     return;
   char *rett = haystack;
@@ -69,22 +69,23 @@ static void tokenize(char *haystack, char *needle) {
   }
 }
 
-static inline _Bool check_extension(const char *filename) {
+static inline _Bool _check_extension(const char *filename) {
   return strncmp(filename + strlen(filename) - 5, ".cgrf", 5) == 0 ? 0 : 1;
 }
 
 struct array_str_s *cgrf_parse_file(const char *filename) {
-  CGRF_ASSERT(filename, "File name should not be NULL", __FILE__, __LINE__);
-  CGRF_ASSERT(check_extension(filename) == 0,
-              "Extension of file should be .cgrf", __FILE__, __LINE__);
+  CGRF_ASSERT(filename, "File name should not be NULL", __FILE__, __LINE__,
+              __func__);
+  CGRF_ASSERT(_check_extension(filename) == 0,
+              "Extension of file should be .cgrf", __FILE__, __LINE__,
+              __func__);
   FILE *f = NULL;
-  CGRF_FOPEN(f, filename, "r", exit(EXIT_FAILURE));
-
+  CGRF_FOPEN(f, filename, "r", exit(EXIT_FAILURE), __FILE__, __LINE__);
   char line[MAX_CHAR];
   while (!feof(f) && fgets(line, MAX_CHAR, f) != NULL) {
-    tokenize(trim_line(line), "->");
+    _tokenize(_trim_line(line), "->");
     for (size_t i = 0; i < array_str_size(t); i++)
-      array_str_set_at(t, i, trim_line(*array_str_get(t, i)));
+      array_str_set_at(t, i, _trim_line(*array_str_get(t, i)));
   }
   return t;
 }

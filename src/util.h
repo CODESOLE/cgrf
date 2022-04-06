@@ -33,11 +33,11 @@ size_t strnlength(const char *s, size_t n);
 
 char *strndupl(const char *s, size_t n);
 
-#define CGRF_FOPEN(f, file_name, modes, action)                                \
+#define CGRF_FOPEN(f, file_name, modes, action, file, line)                    \
   do {                                                                         \
     f = fopen(file_name, modes);                                               \
     if (f == NULL) {                                                           \
-      fprintf(stderr, "FOPEN ERR : %s\n", file_name);                          \
+      fprintf(stderr, "FOPEN ERR [file::line] : %s\n", file_name);             \
       action;                                                                  \
     }                                                                          \
   } while (0)
@@ -77,9 +77,10 @@ char *strndupl(const char *s, size_t n);
     p = NULL;                                                                  \
   } while (0)
 
-#define CGRF_ASSERT(x, message, file_name, line)                               \
+#define CGRF_ASSERT(x, message, file_name, line, func_name)                    \
   if (!(x)) {                                                                  \
-    fprintf(stderr, message " [%s::%d]\n", file_name, line);                   \
+    fprintf(stderr, "ASSERT[FUNC: %s]" message " [%s::%d]\n", func_name,       \
+            file_name, line);                                                  \
     debug_break();                                                             \
   }
 

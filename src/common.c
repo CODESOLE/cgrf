@@ -37,7 +37,7 @@
 #include "nuklear/nuklear.h"
 #include "nuklear/nuklear_sdl_gl3.h"
 
-static inline void usage(void) {
+static inline void _usage(void) {
   puts("Usage: cgrf [OPTION...] [FILE...]\n"
        "A simple graph visualization program\n"
        "\n"
@@ -110,9 +110,9 @@ void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext *glContext) {
 #define ARGS_HELP 1
 #define ARGS_VERSION 2
 
-void cgrf_parse_cmd_arguments(int argc, char **argv) {
+void cgrf_parse_cmdline_args(int argc, char **argv) {
   if (argc < 2) {
-    usage();
+    _usage();
     exit(EXIT_FAILURE);
   }
   int opts = -1, option_index = 0;
@@ -135,14 +135,14 @@ void cgrf_parse_cmd_arguments(int argc, char **argv) {
       break;
     case ARGS_HELP:
       flag_help = 1;
-      usage();
+      _usage();
       exit(EXIT_SUCCESS);
       break;
     case '?':
       exit(EXIT_FAILURE);
       break;
     default:
-      usage();
+      _usage();
       exit(EXIT_FAILURE);
     }
   }

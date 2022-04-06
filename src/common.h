@@ -103,6 +103,6 @@ void cgrf_handle_input(struct nk_context *ctx, SDL_Event *evt,
  * @param argc
  * @param argv
  */
-void cgrf_parse_cmd_arguments(int argc, char **argv);
+void cgrf_parse_cmdline_args(int argc, char **argv);
 
 #endif /* _CGRF_COMMON_H_ */
