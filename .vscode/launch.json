@@ -6,8 +6,11 @@
       "type": "lldb",
       "request": "launch",
       "program": "${workspaceFolder}/build/cgrf",
-      "args": [],
-      "cwd": "${workspaceFolder}/build"
+      "args": [
+        "--file",
+        "./build/test.cgrf"
+      ],
+      "cwd": "${workspaceFolder}"
     },
     {
       "name": "Windows - Debug",

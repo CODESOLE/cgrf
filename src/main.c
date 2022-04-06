@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 
   SDL_Event evt;
   while (is_running) {
-    cgrf_handle_input(&evt, &is_running);
+    cgrf_handle_input(ctx, &evt, &is_running);
     cgrf_gl_clear_color((float[4]){0.1f, 0.1f, 0.1f, 1.0f});
     cgrf_render_graph(ctx);
     cgrf_sdl_routine(win, &width, &height);

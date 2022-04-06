@@ -36,6 +36,8 @@
 #define CGRF_MAJOR_VER 0 /**< CGRF MAJOR VERSION */
 #define CGRF_MINOR_VER 1 /**< CGRF MINOR VERSION */
 
+struct nk_context;
+
 /**
  * @brief opengl clear color for framebuffer
  *
@@ -85,7 +87,8 @@ void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext *glContext);
  *
  * @param win
  */
-void cgrf_handle_input(SDL_Event *evt, _Bool *is_running);
+void cgrf_handle_input(struct nk_context *ctx, SDL_Event *evt,
+                       _Bool *is_running);
 
 /**
  * @brief parse command line arguments

@@ -73,7 +73,7 @@ SDL_Window *cgrf_sdl_glad_init(SDL_GLContext *glContext, int width, int height,
     exit(EXIT_FAILURE);
   }
 
-  glContext = SDL_GL_CreateContext(window);
+  *glContext = SDL_GL_CreateContext(window);
   CGRF_UNUSED(glContext);
 
   if (!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress)) {
@@ -154,10 +154,13 @@ void cgrf_parse_cmd_arguments(int argc, char **argv) {
   }
 }
 
-void cgrf_handle_input(SDL_Event *evt, _Bool *is_running) {
+void cgrf_handle_input(struct nk_context *ctx, SDL_Event *evt,
+                       _Bool *is_running) {
+  nk_input_begin(ctx);
   while (SDL_PollEvent(evt)) {
     if (evt->type == SDL_QUIT)
       *is_running = 0;
     nk_sdl_handle_event(evt);
   }
+  nk_input_end(ctx);
 }
