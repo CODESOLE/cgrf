@@ -37,7 +37,7 @@ char *strndupl(const char *s, size_t n);
   do {                                                                         \
     f = fopen(file_name, modes);                                               \
     if (f == NULL) {                                                           \
-      fprintf(stderr, "FOPEN ERR [file::line] : %s\n", file_name);             \
+      fprintf(stderr, "FOPEN ERR [%s::%d] : %s\n", file, line, file_name);     \
       action;                                                                  \
     }                                                                          \
   } while (0)
