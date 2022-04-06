@@ -43,7 +43,7 @@ struct nk_context;
  *
  * @param clear_color
  */
-void cgrf_gl_clear_color(float clear_color[4]);
+void cgrf_gl_clear_color(float r, float g, float b, float a);
 
 /**
  * @brief initial windows creation & opengl context creation

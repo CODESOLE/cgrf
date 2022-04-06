@@ -46,9 +46,9 @@ static inline void usage(void) {
        "--file [filename]   specify file\n");
 }
 
-void cgrf_gl_clear_color(float clear_color[4]) {
+void cgrf_gl_clear_color(float r, float g, float b, float a) {
   glClear(GL_COLOR_BUFFER_BIT);
-  glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
+  glClearColor(r, g, b, a);
 }
 
 SDL_Window *cgrf_sdl_glad_init(SDL_GLContext *glContext, int width, int height,
