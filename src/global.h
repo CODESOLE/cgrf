@@ -26,6 +26,7 @@
 
 #define MAX_FILE_NAME 128
 extern char file[MAX_FILE_NAME];
-extern _Bool flag_version, flag_help, flag_file;
+extern _Bool flag_version, flag_help, flag_file, is_running;
+extern int width, height;
 
 #endif /* _CGRF_GLOBAL_H_ */

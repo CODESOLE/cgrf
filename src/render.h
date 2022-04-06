@@ -32,8 +32,10 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_KEYSTATE_BASED_INPUT
+#include "global.h"
 #include "nuklear/nuklear.h"
 #include "nuklear/nuklear_sdl_gl3.h"
+#include "util.h"
 
 #define MAX_VERTEX_BUFFER 512 * 1024  /**< maximum gui vertex buffer size */
 #define MAX_ELEMENT_BUFFER 128 * 1024 /**< maximum gui element buffer size */

@@ -40,27 +40,14 @@ void cgrf_set_font(struct nk_context *ctx, const char *file_name) {
 }
 
 void cgrf_render_graph(struct nk_context *ctx) {
-  /* GUI */
-  if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
-               NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
-                   NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
-    enum { EASY, HARD };
-    static int op = EASY;
-    static int property = 20;
-
-    nk_layout_row_static(ctx, 30, 80, 1);
-
-    if (nk_button_label(ctx, "button"))
-      fprintf(stdout, "button pressed\n");
-
-    nk_layout_row_dynamic(ctx, 30, 2);
-    if (nk_option_label(ctx, "easy", op == EASY))
-      op = EASY;
-    if (nk_option_label(ctx, "hard", op == HARD))
-      op = HARD;
-
-    nk_layout_row_dynamic(ctx, 25, 1);
-    nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
+  if (nk_begin(ctx, "Graph Viewer", nk_rect(0, 0, width, height), 0)) {
+    struct nk_style *style = &ctx->style;
+    float text_width = style->font->width(
+        style->font->userdata, style->font->height, "hello", strlen("hello"));
+    struct nk_command_buffer *buf = nk_window_get_canvas(ctx);
+    nk_fill_circle(buf,
+                   (struct nk_rect){100.0f, 100.0f, text_width, text_width},
+                   (struct nk_color){23, 23, 23, 255});
   }
   nk_end(ctx);
 

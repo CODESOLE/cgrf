@@ -23,7 +23,9 @@
 
 #include "global.h"
 
-_Bool flag_version = 0, flag_help = 0, flag_file = 0;
+_Bool flag_version = 0, flag_help = 0, flag_file = 0, is_running = 1;
 
 #define MAX_FILE_NAME 128
 char file[MAX_FILE_NAME] = {0};
+
+int width = 0, height = 0;

@@ -72,7 +72,7 @@ SDL_Window *cgrf_sdl_glad_init(SDL_GLContext *glContext, int width, int height,
     SDL_Quit();
     exit(EXIT_FAILURE);
   }
-
+  SDL_SetWindowResizable(window, SDL_TRUE);
   *glContext = SDL_GL_CreateContext(window);
   CGRF_UNUSED(glContext);
 
@@ -157,8 +157,10 @@ void cgrf_parse_cmd_arguments(int argc, char **argv) {
 void cgrf_handle_input(struct nk_context *ctx, SDL_Event *evt,
                        _Bool *is_running) {
   nk_input_begin(ctx);
+  const uint8_t *state = SDL_GetKeyboardState(NULL);
   while (SDL_PollEvent(evt)) {
-    if (evt->type == SDL_QUIT)
+    if (evt->type == SDL_QUIT || state[SDL_SCANCODE_ESCAPE] ||
+        state[SDL_SCANCODE_CAPSLOCK])
       *is_running = 0;
     nk_sdl_handle_event(evt);
   }
