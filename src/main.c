@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
   while (is_running) {
     cgrf_handle_input(ctx, &evt, &is_running);
     cgrf_bg_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
-    cgrf_render_graph(ctx);
+    cgrf_render_graph(ctx, toks);
     cgrf_app_routine(win, &width, &height);
   }
   cgrf_destroy_terminate_sdl(win, gl_ctx);

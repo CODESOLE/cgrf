@@ -40,6 +40,8 @@
 #define MAX_VERTEX_BUFFER 512 * 1024  /**< maximum gui vertex buffer size */
 #define MAX_ELEMENT_BUFFER 128 * 1024 /**< maximum gui element buffer size */
 
+struct array_str_s;
+
 /**
  * @brief set gui font
  *
@@ -53,6 +55,6 @@ void cgrf_set_font(struct nk_context *ctx, const char *file_name);
  *
  * @param ctx nuklear context
  */
-void cgrf_render_graph(struct nk_context *ctx);
+void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks);
 
 #endif /* _CGRF_RENDER_H */

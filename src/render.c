@@ -39,7 +39,8 @@ void cgrf_set_font(struct nk_context *ctx, const char *file_name) {
   }
 }
 
-void cgrf_render_graph(struct nk_context *ctx) {
+void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
+  CGRF_UNUSED(toks);
   if (nk_begin(ctx, "Graph Viewer", nk_rect(0, 0, width, height), 0)) {
     struct nk_style *style = &ctx->style;
     float text_width = style->font->width(
