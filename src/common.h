@@ -57,7 +57,7 @@ void cgrf_bg_clear_color(float r, float g, float b, float a);
  * @param window_name window name
  * @return SDL_Window* window handle
  */
-SDL_Window *cgrf_app_init(SDL_GLContext *glContext, int width, int height,
+SDL_Window *cgrf_app_init(SDL_GLContext glContext, int width, int height,
                           const char *window_name);
 
 /**
@@ -85,7 +85,7 @@ void cgrf_app_routine(SDL_Window *window, int *width, int *height);
  * @param window
  * @param glContext OpenGL context
  */
-void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext *glContext);
+void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext glContext);
 
 /**
  * @brief handle user input

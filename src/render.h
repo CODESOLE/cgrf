@@ -35,12 +35,11 @@
 #include "global.h"
 #include "nuklear/nuklear.h"
 #include "nuklear/nuklear_sdl_gl3.h"
+#include "parser.h"
 #include "util.h"
 
 #define MAX_VERTEX_BUFFER 512 * 1024  /**< maximum gui vertex buffer size */
 #define MAX_ELEMENT_BUFFER 128 * 1024 /**< maximum gui element buffer size */
-
-struct array_str_s;
 
 /**
  * @brief set gui font
@@ -54,7 +53,20 @@ void cgrf_set_font(struct nk_context *ctx, const char *file_name);
  * @brief graph render function
  *
  * @param ctx nuklear context
+ * @param toks tokens
+ * @param pos position of nodes
  */
-void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks);
+void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks,
+                       float *pos);
+
+/**
+ * @brief calculates the position of the nodes
+ *
+ * @param style nuklear style
+ * @param toks tokens
+ * @param pos positons of the nodes of graph
+ */
+void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks,
+                             float *pos);
 
 #endif /* _CGRF_RENDER_H */

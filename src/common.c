@@ -51,7 +51,7 @@ void cgrf_bg_clear_color(float r, float g, float b, float a) {
   glClearColor(r, g, b, a);
 }
 
-SDL_Window *cgrf_app_init(SDL_GLContext *glContext, int width, int height,
+SDL_Window *cgrf_app_init(SDL_GLContext glContext, int width, int height,
                           const char *window_name) {
   SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
@@ -73,7 +73,7 @@ SDL_Window *cgrf_app_init(SDL_GLContext *glContext, int width, int height,
     exit(EXIT_FAILURE);
   }
   SDL_SetWindowResizable(window, SDL_TRUE);
-  *glContext = SDL_GL_CreateContext(window);
+  glContext = SDL_GL_CreateContext(window);
   CGRF_UNUSED(glContext);
 
   if (!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress)) {
@@ -99,7 +99,7 @@ void cgrf_app_routine(SDL_Window *window, int *width, int *height) {
   SDL_GL_SwapWindow(window);
 }
 
-void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext *glContext) {
+void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext glContext) {
   nk_sdl_shutdown();
   SDL_GL_DeleteContext(glContext);
   SDL_DestroyWindow(window);

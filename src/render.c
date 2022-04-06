@@ -39,16 +39,37 @@ void cgrf_set_font(struct nk_context *ctx, const char *file_name) {
   }
 }
 
-void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
-  CGRF_UNUSED(toks);
+static inline float _get_text_width(struct nk_style *style,
+                                    struct array_str_s *toks, size_t i) {
+  return style->font->width(style->font->userdata, style->font->height,
+                            *array_str_get(toks, i),
+                            strlen(*array_str_get(toks, i)));
+}
+
+static inline void _draw_circle(struct nk_command_buffer *buf, float x, float y,
+                                float w, float h, struct nk_color col) {
+  nk_fill_circle(buf, (struct nk_rect){x, y, w, h}, col);
+  nk_stroke_circle(buf, (struct nk_rect){x, y, w, h}, 0.1f,
+                   nk_rgb(255, 255, 255));
+}
+
+void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks,
+                             float *pos) {
+  for (size_t i = 0; i < array_str_size(toks); ++i) {
+    pos[i * 4] = 100.0f;
+    pos[i * 4 + 1] = 100.0f;
+    pos[i * 4 + 2] = _get_text_width(style, toks, i);
+    pos[i * 4 + 3] = style->font->height;
+  }
+}
+
+void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks,
+                       float *pos) {
   if (nk_begin(ctx, "Graph Viewer", nk_rect(0, 0, width, height), 0)) {
-    struct nk_style *style = &ctx->style;
-    float text_width = style->font->width(
-        style->font->userdata, style->font->height, "hello", strlen("hello"));
     struct nk_command_buffer *buf = nk_window_get_canvas(ctx);
-    nk_fill_circle(buf,
-                   (struct nk_rect){100.0f, 100.0f, text_width, text_width},
-                   (struct nk_color){23, 23, 23, 255});
+    for (size_t i = 0; i < array_str_size(toks); ++i)
+      _draw_circle(buf, pos[i * 4], pos[i * 4 + 1], pos[i * 4 + 2],
+                   pos[i * 4 + 3], nk_rgb(25, 25, 25));
   }
   nk_end(ctx);
 

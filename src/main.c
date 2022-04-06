@@ -29,11 +29,8 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-  /*   puts("=====================FINAL======================");
-    for (size_t i = 0; i < array_str_size(toks); i++)
-      printf("final_string:%s@\n", *array_str_get(toks, i)); */
   struct array_str_s *toks = NULL;
-  SDL_GLContext gl_ctx = {0};
+  SDL_GLContext gl_ctx = NULL;
   cgrf_parse_cmdline_args(argc, argv);
 
   if (flag_file)
@@ -41,21 +38,30 @@ int main(int argc, char **argv) {
   else
     exit(EXIT_FAILURE);
 
-  SDL_Window *win =
-      cgrf_app_init(&gl_ctx, 800, 600, "CGRF GRAPH VISUALIZATION");
+  float *pos = NULL;
+  CGRF_MALLOC(pos, array_str_size(toks) * 4, __FILE__, __LINE__,
+              exit(EXIT_FAILURE));
+
+  SDL_Window *win = cgrf_app_init(gl_ctx, 800, 600, "CGRF GRAPH VISUALIZATION");
 
   struct nk_context *ctx = nk_sdl_init(win);
   cgrf_set_font(ctx, NULL);
+  cgrf_calculate_node_pos(&ctx->style, toks, pos);
+
+  // puts("=====================FINAL======================");
+  // for (size_t i = 0; i < array_str_size(toks); i++)
+  //   printf("final_string:%s@\n", *array_str_get(toks, i));
 
   SDL_Event evt;
   while (is_running) {
     cgrf_handle_input(ctx, &evt, &is_running);
     cgrf_bg_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
-    cgrf_render_graph(ctx, toks);
+    cgrf_render_graph(ctx, toks, pos);
     cgrf_app_routine(win, &width, &height);
   }
   cgrf_destroy_terminate_sdl(win, gl_ctx);
   array_str_clear(toks);
+  free(pos);
 
   return 0;
 }
