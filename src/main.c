@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
 
   SDL_Window *win =
-      cgrf_sdl_glad_init(&gl_ctx, 800, 600, "CGRF GRAPH VISUALIZATION");
+      cgrf_app_init(&gl_ctx, 800, 600, "CGRF GRAPH VISUALIZATION");
 
   struct nk_context *ctx = nk_sdl_init(win);
   cgrf_set_font(ctx, NULL);
@@ -50,11 +50,10 @@ int main(int argc, char **argv) {
   SDL_Event evt;
   while (is_running) {
     cgrf_handle_input(ctx, &evt, &is_running);
-    cgrf_gl_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
+    cgrf_bg_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
     cgrf_render_graph(ctx);
-    cgrf_sdl_routine(win, &width, &height);
+    cgrf_app_routine(win, &width, &height);
   }
-  nk_sdl_shutdown();
   cgrf_destroy_terminate_sdl(win, gl_ctx);
   array_str_clear(toks);
 

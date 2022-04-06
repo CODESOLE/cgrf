@@ -46,13 +46,13 @@ static inline void usage(void) {
        "--file [filename]   specify file\n");
 }
 
-void cgrf_gl_clear_color(float r, float g, float b, float a) {
+void cgrf_bg_clear_color(float r, float g, float b, float a) {
   glClear(GL_COLOR_BUFFER_BIT);
   glClearColor(r, g, b, a);
 }
 
-SDL_Window *cgrf_sdl_glad_init(SDL_GLContext *glContext, int width, int height,
-                               const char *window_name) {
+SDL_Window *cgrf_app_init(SDL_GLContext *glContext, int width, int height,
+                          const char *window_name) {
   SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
@@ -81,9 +81,9 @@ SDL_Window *cgrf_sdl_glad_init(SDL_GLContext *glContext, int width, int height,
     exit(EXIT_FAILURE);
   }
 
-  printf("Vendor:   %s\n", glGetString(GL_VENDOR));
-  printf("Renderer: %s\n", glGetString(GL_RENDERER));
-  printf("Version:  %s\n", glGetString(GL_VERSION));
+  printf("GL Vendor:   %s\n", glGetString(GL_VENDOR));
+  printf("GL Renderer: %s\n", glGetString(GL_RENDERER));
+  printf("GL Version:  %s\n", glGetString(GL_VERSION));
 
   return window;
 }
@@ -93,13 +93,14 @@ float cgrf_calculate_ratio(SDL_Window *window, int *width, int *height) {
   return *width / (float)*height;
 }
 
-void cgrf_sdl_routine(SDL_Window *window, int *width, int *height) {
+void cgrf_app_routine(SDL_Window *window, int *width, int *height) {
   SDL_GetWindowSize(window, width, height);
   glViewport(0, 0, *width, *height);
   SDL_GL_SwapWindow(window);
 }
 
 void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext *glContext) {
+  nk_sdl_shutdown();
   SDL_GL_DeleteContext(glContext);
   SDL_DestroyWindow(window);
   SDL_Quit();

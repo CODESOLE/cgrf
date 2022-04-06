@@ -46,7 +46,7 @@ struct nk_context;
  * @param b blue color
  * @param a alpha color
  */
-void cgrf_gl_clear_color(float r, float g, float b, float a);
+void cgrf_bg_clear_color(float r, float g, float b, float a);
 
 /**
  * @brief initial windows creation & opengl context creation
@@ -57,8 +57,8 @@ void cgrf_gl_clear_color(float r, float g, float b, float a);
  * @param window_name window name
  * @return SDL_Window* window handle
  */
-SDL_Window *cgrf_sdl_glad_init(SDL_GLContext *glContext, int width, int height,
-                               const char *window_name);
+SDL_Window *cgrf_app_init(SDL_GLContext *glContext, int width, int height,
+                          const char *window_name);
 
 /**
  * @brief calculate aspect ratio
@@ -77,7 +77,7 @@ float cgrf_calculate_ratio(SDL_Window *window, int *width, int *height);
  * @param width
  * @param height
  */
-void cgrf_sdl_routine(SDL_Window *window, int *width, int *height);
+void cgrf_app_routine(SDL_Window *window, int *width, int *height);
 
 /**
  * @brief window destroy
