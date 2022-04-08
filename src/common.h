@@ -24,7 +24,6 @@
 #ifndef _CGRF_COMMON_H_
 #define _CGRF_COMMON_H_
 
-#include "debugbreak/debugbreak.h"
 #include "glad/glad.h"
 #include "global.h"
 #include <SDL2/SDL.h>

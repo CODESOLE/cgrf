@@ -74,11 +74,8 @@ static inline _Bool _check_extension(const char *filename) {
 }
 
 struct array_str_s *cgrf_parse_file(const char *filename) {
-  CGRF_ASSERT(filename, "File name should not be NULL", __FILE__, __LINE__,
-              __func__);
-  CGRF_ASSERT(_check_extension(filename) == 0,
-              "Extension of file should be .cgrf", __FILE__, __LINE__,
-              __func__);
+  assert(filename);
+  assert(_check_extension(filename) == 0);
   FILE *f = NULL;
   CGRF_FOPEN(f, filename, "r", exit(EXIT_FAILURE), __FILE__, __LINE__);
   char line[MAX_CHAR];

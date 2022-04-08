@@ -24,6 +24,8 @@
 #ifndef _CGRF_GLOBAL_H_
 #define _CGRF_GLOBAL_H_
 
+#define WIN_WIDTH 800
+#define WIN_HEIGHT 600
 #define MAX_FILE_NAME 128
 extern char file[MAX_FILE_NAME];
 extern _Bool flag_version, flag_help, flag_file, is_running;

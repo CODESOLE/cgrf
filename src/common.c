@@ -22,7 +22,6 @@
  */
 
 #include "common.h"
-#include "libbsd_string/string.h"
 #include "util.h"
 #include <string.h>
 

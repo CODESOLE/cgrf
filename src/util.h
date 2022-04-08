@@ -1,6 +1,6 @@
 /**
  * @file util.h
- * @brief general utilities used around program
+ * @brief general utilities
  * @author CODESOLE
  * @copyright Copyright (c) 2022
  *
@@ -24,14 +24,32 @@
 #ifndef _CGRF_UTIL_H
 #define _CGRF_UTIL_H
 
-#include "debugbreak/debugbreak.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+/*
+ * Copy string src to buffer dst of size dsize.  At most dsize-1
+ * chars will be copied.  Always NUL terminates (unless dsize == 0).
+ * Returns strlen(src); if retval >= dsize, truncation occurred.
+ */
+size_t strlcpy(char *dst, const char *src, size_t siz);
+/*
+ * Appends src to string dst of size dsize (unlike strncat, dsize is the
+ * full size of dst, not space left).  At most dsize-1 characters
+ * will be copied.  Always NUL terminates (unless dsize <= strlen(dst)).
+ * Returns strlen(src) + MIN(dsize, strlen(initial dst)).
+ * If retval >= dsize, truncation occurred.
+ */
+size_t strlcat(char *dst, const char *src, size_t siz);
 size_t strnlength(const char *s, size_t n);
-
 char *strndupl(const char *s, size_t n);
+
+#define CGRF_STRINGIFY(name) #name
+#define CGRF_CONCAT_IMPL(a, b) a##b
+#define CGRF_CONCAT(a, b) CGRF_CONCAT_IMPL(a, b)
+#define CGRF_MACRO_VAR(name) CGRF_CONCAT(name, __LINE__)
+#define CGRF_PAD(n) char CGRF_MACRO_VAR(_padding_)[n]
 
 #define CGRF_FOPEN(f, file_name, modes, action, file, line)                    \
   do {                                                                         \
@@ -76,13 +94,6 @@ char *strndupl(const char *s, size_t n);
     free(p);                                                                   \
     p = NULL;                                                                  \
   } while (0)
-
-#define CGRF_ASSERT(x, message, file_name, line, func_name)                    \
-  if (!(x)) {                                                                  \
-    fprintf(stderr, "ASSERT[FUNC: %s]" message " [%s::%d]\n", func_name,       \
-            file_name, line);                                                  \
-    debug_break();                                                             \
-  }
 
 #define CGRF_UNUSED(expr)                                                      \
   do {                                                                         \

@@ -38,15 +38,12 @@ int main(int argc, char **argv) {
   else
     exit(EXIT_FAILURE);
 
-  float *pos = NULL;
-  CGRF_MALLOC(pos, array_str_size(toks) * 4, __FILE__, __LINE__,
-              exit(EXIT_FAILURE));
-
-  SDL_Window *win = cgrf_app_init(gl_ctx, 800, 600, "CGRF GRAPH VISUALIZATION");
+  SDL_Window *win =
+      cgrf_app_init(gl_ctx, WIN_WIDTH, WIN_HEIGHT, "CGRF GRAPH VISUALIZATION");
 
   struct nk_context *ctx = nk_sdl_init(win);
   cgrf_set_font(ctx, NULL);
-  cgrf_calculate_node_pos(&ctx->style, toks, pos);
+  cgrf_calculate_node_pos(&ctx->style, toks);
 
   // puts("=====================FINAL======================");
   // for (size_t i = 0; i < array_str_size(toks); i++)
@@ -56,12 +53,11 @@ int main(int argc, char **argv) {
   while (is_running) {
     cgrf_handle_input(ctx, &evt, &is_running);
     cgrf_bg_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
-    cgrf_render_graph(ctx, toks, pos);
+    cgrf_render_graph(ctx, toks);
     cgrf_app_routine(win, &width, &height);
   }
   cgrf_destroy_terminate_sdl(win, gl_ctx);
   array_str_clear(toks);
-  free(pos);
 
   return 0;
 }
