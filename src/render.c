@@ -80,13 +80,12 @@ static inline void _draw_circle(struct nk_command_buffer *buf, node_s *n,
 
 static inline node_s _create_node(struct nk_style *style,
                                   const char *inner_text) {
-  node_s n = {strndupl(inner_text, strlen(inner_text)),
-              uid++,
-              (struct nk_rect){0.0f, 0.0f,
-                               _get_text_width(style, inner_text) + 10.0f,
-                               style->font->height},
-              {0}};
-  return n;
+  return (node_s){strndupl(inner_text, strlen(inner_text)),
+                  uid++,
+                  (struct nk_rect){0.0f, 0.0f,
+                                   _get_text_width(style, inner_text) + 10.0f,
+                                   style->font->height},
+                  {0}};
 }
 
 void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks) {
@@ -117,22 +116,23 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
                        arr_node_cref(it)->bound.w, arr_node_cref(it)->bound.h));
 
       /* execute node window */
-      if (nk_group_begin(ctx, arr_node_cref(it)->inner_text, 0)) {
-        /* ================= NODE CONTENT =====================*/
-        nk_draw_text(canvas,
-                     nk_rect(arr_node_cref(it)->bound.x - scrolling.x,
-                             arr_node_cref(it)->bound.y - scrolling.y,
-                             arr_node_cref(it)->bound.w,
-                             arr_node_cref(it)->bound.h),
-                     arr_node_cref(it)->inner_text,
-                     strlen(arr_node_cref(it)->inner_text), ctx->style.font,
-                     nk_rgb(255, 255, 255), nk_rgb(0, 0, 0));
+      /* ================= NODE CONTENT =====================*/
+      nk_layout_row_begin(ctx, NK_STATIC, 30, 1);
+      nk_layout_row_push(ctx, 50);
+      nk_label(ctx, arr_node_cref(it)->inner_text, NK_TEXT_CENTERED);
+      nk_layout_row_end(ctx);
+      // nk_draw_text(canvas,
+      //              nk_rect(arr_node_cref(it)->bound.x - scrolling.x,
+      //                      arr_node_cref(it)->bound.y - scrolling.y,
+      //                      arr_node_cref(it)->bound.w,
+      //                      arr_node_cref(it)->bound.h),
+      //              arr_node_cref(it)->inner_text,
+      //              strlen(arr_node_cref(it)->inner_text), ctx->style.font,
+      //              nk_rgb(255, 255, 255), nk_rgb(0, 0, 0));
 
-        for (size_t i = 0; i < arr_node_size(nodes); ++i)
-          _draw_circle(canvas, arr_node_get(nodes, i), nk_rgb(25, 25, 25));
-        /* ====================================================*/
-        nk_group_end(ctx);
-      }
+      for (size_t i = 0; i < arr_node_size(nodes); ++i)
+        _draw_circle(canvas, arr_node_get(nodes, i), nk_rgb(25, 25, 25));
+      /* ====================================================*/
     }
 
     _draw_grid(ctx, scrolling, 32.0f, nk_rgb(50, 50, 50));
