@@ -10,7 +10,8 @@
         "--file",
         "./build/test.cgrf"
       ],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "Debug"
     },
     {
       "name": "Windows - Debug",
@@ -35,7 +36,8 @@
           "text": "-gdb-set disassembly-flavor intel",
           "ignoreFailures": true
         }
-      ]
+      ],
+      "preLaunchTask": "Debug"
     }
   ]
 }
