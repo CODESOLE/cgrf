@@ -38,7 +38,7 @@
 struct nk_context;
 
 /**
- * @brief opengl clear color for framebuffer
+ * @brief opengl background clear color
  *
  * @param r red color
  * @param g green color
@@ -70,7 +70,7 @@ SDL_Window *cgrf_app_init(SDL_GLContext glContext, int width, int height,
 float cgrf_calculate_ratio(SDL_Window *window, int *width, int *height);
 
 /**
- * @brief swap buffers, pollevents and viewport resize actions
+ * @brief swap buffers and viewport resize actions
  *
  * @param window
  * @param width
@@ -91,7 +91,7 @@ void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext glContext);
  *
  * @param ctx nuklear context
  * @param evt SDL event
- * @param is_running should window open
+ * @param is_running should window open/close
  */
 void cgrf_handle_input(struct nk_context *ctx, SDL_Event *evt,
                        _Bool *is_running);
