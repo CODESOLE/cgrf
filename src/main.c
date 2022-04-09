@@ -45,9 +45,9 @@ int main(int argc, char **argv) {
   cgrf_set_font(ctx, NULL);
   cgrf_calculate_node_pos(&ctx->style, toks);
 
-  // puts("=====================FINAL======================");
-  // for (size_t i = 0; i < array_str_size(toks); i++)
-  //   printf("final_string:%s@\n", *array_str_get(toks, i));
+  puts("=====================FINAL======================");
+  for (size_t i = 0; i < array_str_size(toks); i++)
+    printf("final_string:%s@\n", *array_str_get(toks, i));
 
   SDL_Event evt;
   while (is_running) {
