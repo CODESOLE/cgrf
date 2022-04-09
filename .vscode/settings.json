@@ -28,5 +28,6 @@
       }
     }
   },
-  "terminal.integrated.defaultProfile.windows": "MSYS2Bash"
+  "terminal.integrated.defaultProfile.windows": "MSYS2Bash",
+  "editor.formatOnSave": true
 }
