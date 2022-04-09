@@ -40,12 +40,26 @@ void cgrf_set_font(struct nk_context *ctx, const char *file_name) {
   }
 }
 
+void _draw_grid(struct nk_context *ctx, const struct nk_rect scrolling,
+                const float grid_size, const struct nk_color grid_color) {
+  struct nk_rect size = nk_layout_space_bounds(ctx);
+  struct nk_command_buffer *canvas = nk_window_get_canvas(ctx);
+  for (float x = (float)fmod(size.x - scrolling.x, grid_size); x < size.w;
+       x += grid_size)
+    nk_stroke_line(canvas, x + size.x, size.y, x + size.x, size.y + size.h,
+                   1.0f, grid_color);
+  for (float y = (float)fmod(size.y - scrolling.y, grid_size); y < size.h;
+       y += grid_size)
+    nk_stroke_line(canvas, size.x, y + size.y, size.x + size.w, y + size.y,
+                   1.0f, grid_color);
+}
+
 static uint32_t uid = 0;
 
 typedef struct node {
   const char *inner_text;
   uint32_t id;
-  float x, y, w, h;
+  struct nk_rect bound;
   CGRF_PAD(4);
 } node_s;
 
@@ -60,19 +74,17 @@ static inline float _get_text_width(struct nk_style *style, const char *text) {
 
 static inline void _draw_circle(struct nk_command_buffer *buf, node_s *n,
                                 struct nk_color col) {
-  nk_fill_circle(buf, (struct nk_rect){n->x, n->y, n->w, n->h}, col);
-  nk_stroke_circle(buf, (struct nk_rect){n->x, n->y, n->w, n->h}, 0.1f,
-                   nk_rgb(255, 255, 255));
+  nk_fill_circle(buf, n->bound, col);
+  nk_stroke_circle(buf, n->bound, 0.1f, nk_rgb(255, 255, 255));
 }
 
 static inline node_s _create_node(struct nk_style *style,
                                   const char *inner_text) {
   node_s n = {strndupl(inner_text, strlen(inner_text)),
               uid++,
-              0.0f,
-              0.0f,
-              _get_text_width(style, inner_text) + 10.0f,
-              style->font->height,
+              (struct nk_rect){0.0f, 0.0f,
+                               _get_text_width(style, inner_text) + 10.0f,
+                               style->font->height},
               {0}};
   return n;
 }
@@ -80,8 +92,8 @@ static inline node_s _create_node(struct nk_style *style,
 void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks) {
   for (size_t i = 0; i < array_str_size(toks); ++i) {
     node_s n = _create_node(style, *array_str_get(toks, i));
-    n.x = rand() % width;
-    n.y = rand() % height;
+    n.bound.x = rand() % width;
+    n.bound.y = rand() % height;
     arr_node_push_back(nodes, n);
   }
 }
@@ -89,7 +101,8 @@ void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks) {
 void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
   static struct nk_rect scrolling = {0};
   struct nk_input *in = &ctx->input;
-  if (nk_begin(ctx, "Graph Viewer", nk_rect(0, 0, width, height), 0)) {
+  if (nk_begin(ctx, "Graph Viewer", nk_rect(0, 0, width, height),
+               NK_WINDOW_NO_SCROLLBAR)) {
     /* allocate complete window space */
     struct nk_command_buffer *canvas = nk_window_get_canvas(ctx);
     struct nk_rect total_space = nk_window_get_content_region(ctx);
@@ -98,43 +111,31 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
     arr_node_it_t it;
     for (arr_node_it(it, nodes); !arr_node_end_p(it); arr_node_next(it)) {
       /* calculate scrolled node window position and size */
-      nk_layout_space_push(ctx,
-                           nk_rect(arr_node_cref(it)->x - scrolling.x,
-                                   arr_node_cref(it)->y - scrolling.y,
-                                   arr_node_cref(it)->w, arr_node_cref(it)->h));
+      nk_layout_space_push(
+          ctx, nk_rect(arr_node_cref(it)->bound.x - scrolling.x,
+                       arr_node_cref(it)->bound.y - scrolling.y,
+                       arr_node_cref(it)->bound.w, arr_node_cref(it)->bound.h));
 
       /* execute node window */
       if (nk_group_begin(ctx, arr_node_cref(it)->inner_text, 0)) {
         /* ================= NODE CONTENT =====================*/
-        nk_layout_row_dynamic(ctx, 25, 1);
         nk_draw_text(canvas,
-                     nk_rect(arr_node_cref(it)->x - scrolling.x,
-                             arr_node_cref(it)->y - scrolling.y,
-                             arr_node_cref(it)->w, arr_node_cref(it)->h),
+                     nk_rect(arr_node_cref(it)->bound.x - scrolling.x,
+                             arr_node_cref(it)->bound.y - scrolling.y,
+                             arr_node_cref(it)->bound.w,
+                             arr_node_cref(it)->bound.h),
                      arr_node_cref(it)->inner_text,
                      strlen(arr_node_cref(it)->inner_text), ctx->style.font,
                      nk_rgb(255, 255, 255), nk_rgb(0, 0, 0));
+
+        for (size_t i = 0; i < arr_node_size(nodes); ++i)
+          _draw_circle(canvas, arr_node_get(nodes, i), nk_rgb(25, 25, 25));
         /* ====================================================*/
         nk_group_end(ctx);
       }
     }
 
-    struct nk_rect size = nk_layout_space_bounds(ctx);
-
-    /* display grid */
-    const float grid_size = 32.0f;
-    const struct nk_color grid_color = nk_rgb(50, 50, 50);
-    for (float x = (float)fmod(size.x - scrolling.x, grid_size); x < size.w;
-         x += grid_size)
-      nk_stroke_line(canvas, x + size.x, size.y, x + size.x, size.y + size.h,
-                     1.0f, grid_color);
-    for (float y = (float)fmod(size.y - scrolling.y, grid_size); y < size.h;
-         y += grid_size)
-      nk_stroke_line(canvas, size.x, y + size.y, size.x + size.w, y + size.y,
-                     1.0f, grid_color);
-
-    for (size_t i = 0; i < arr_node_size(nodes); ++i)
-      _draw_circle(canvas, arr_node_get(nodes, i), nk_rgb(25, 25, 25));
+    _draw_grid(ctx, scrolling, 32.0f, nk_rgb(50, 50, 50));
 
     /* window content scrolling */
     if (nk_input_is_mouse_hovering_rect(in, nk_window_get_bounds(ctx)) &&
