@@ -28,6 +28,10 @@
 #include "util.h"
 #include <stdio.h>
 
+#ifdef _WIN32
+#define SDL_MAIN_HANDLED
+#endif
+
 int main(int argc, char **argv) {
   struct array_str_s *toks = NULL;
   SDL_GLContext gl_ctx = NULL;

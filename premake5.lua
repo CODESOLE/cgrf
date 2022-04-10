@@ -1,6 +1,5 @@
 workspace "cgrf"
   configurations { "Debug", "Release" }
-  platforms { "x64" }
   location "build"
 
 project "cgrf"
@@ -14,13 +13,10 @@ project "cgrf"
   os.copyfile("tests/test.cgrf", "build")
   os.copyfile("tests/test_with_commented_lines.cgrf", "build")
   buildoptions { "-pedantic" }
+
   includedirs { "src", "dep" }
 
-  if os.host() == "windows" then
-    links { "SDL2main", "SDL2", "opengl32" }
-  elseif os.host() == "linux" then
-    links { "SDL2main", "SDL2", "GL", "m" }
-  end
+  links { "SDL2main", "SDL2", "m" }
 
   files { "src/**.c", "dep/**.c" }
 
