@@ -1,0 +1,17 @@
+name: build-macos
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  macos-build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: install-deps
+      run: brew install sdl2 premake
+
+    - name: Build
+      run: premake5 gmake2 && make -C build config=debug
