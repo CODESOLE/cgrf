@@ -1,4 +1,8 @@
 # CGRF
+[![build-windows](https://github.com/CODESOLE/cgrf/actions/workflows/build-windows.yml/badge.svg)](https://github.com/CODESOLE/cgrf/actions/workflows/build-windows.yml) 
+[![build-linux](https://github.com/CODESOLE/cgrf/actions/workflows/build-linux.yml/badge.svg)](https://github.com/CODESOLE/cgrf/actions/workflows/build-linux.yml) 
+[![build-macos](https://github.com/CODESOLE/cgrf/actions/workflows/build-macos.yml/badge.svg)](https://github.com/CODESOLE/cgrf/actions/workflows/build-macos.yml)
+
 A very simple c graph visualization.
 
 # Build on Windows
