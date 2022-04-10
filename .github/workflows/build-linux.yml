@@ -1,0 +1,17 @@
+name: build-linux
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ubuntu-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: install-deps
+      run: sudo apt update && sudo apt  -y install libsdl2-dev premake4
+      
+    - name: Build
+      run: ./build.sh
