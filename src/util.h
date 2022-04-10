@@ -33,7 +33,7 @@
  * chars will be copied.  Always NUL terminates (unless dsize == 0).
  * Returns strlen(src); if retval >= dsize, truncation occurred.
  */
-size_t strlcpy(char *dst, const char *src, size_t siz);
+size_t xstrlcpy(char *dst, const char *src, size_t siz);
 /*
  * Appends src to string dst of size dsize (unlike strncat, dsize is the
  * full size of dst, not space left).  At most dsize-1 characters
@@ -41,7 +41,7 @@ size_t strlcpy(char *dst, const char *src, size_t siz);
  * Returns strlen(src) + MIN(dsize, strlen(initial dst)).
  * If retval >= dsize, truncation occurred.
  */
-size_t strlcat(char *dst, const char *src, size_t siz);
+size_t xstrlcat(char *dst, const char *src, size_t siz);
 size_t strnlength(const char *s, size_t n);
 char *strndupl(const char *s, size_t n);
 

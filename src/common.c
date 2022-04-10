@@ -129,7 +129,7 @@ void cgrf_parse_cmdline_args(int argc, char **argv) {
       break;
     case ARGS_FILE:
       flag_file = 1;
-      strlcpy(file, optarg, sizeof(file));
+      xstrlcpy(file, optarg, sizeof(file));
       printf("file to visualize: %s\n", file);
       break;
     case ARGS_HELP:

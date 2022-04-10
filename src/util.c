@@ -38,7 +38,7 @@ char *strndupl(const char *s, size_t n) {
   return (char *)memcpy(new, s, len);
 }
 
-size_t strlcat(char *dst, const char *src, size_t dsize) {
+size_t xstrlcat(char *dst, const char *src, size_t dsize) {
   const char *odst = dst;
   const char *osrc = src;
   size_t n = dsize;
@@ -64,7 +64,7 @@ size_t strlcat(char *dst, const char *src, size_t dsize) {
   return (dlen + (src - osrc)); /* count does not include NUL */
 }
 
-size_t strlcpy(char *dst, const char *src, size_t dsize) {
+size_t xstrlcpy(char *dst, const char *src, size_t dsize) {
   const char *osrc = src;
   size_t nleft = dsize;
 
