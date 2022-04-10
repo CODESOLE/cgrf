@@ -16,7 +16,9 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: base-devel mingw-w64-x86_64-{toolchain,premake,SDL2}
+          install: base-devel
+          pacboy: >-
+            toolchain:x premake:x SDL2:x
 
       - name: CI-Build
         run: ./build.sh
