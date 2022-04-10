@@ -9,9 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    
+
+    - name: Setup premake
+      uses: abel0b/setup-premake@v2
+      with:
+        version: "5.0.0-beta1"
+
     - name: install-deps
-      run: sudo apt update && sudo apt  -y install libsdl2-dev premake4
+      run: sudo apt update && sudo apt  -y install libsdl2-dev
       
     - name: Build
-      run: premake4 --file=premake5.lua gmake2 && make -C build config=debug
+      run: premake5 gmake2 && make -C build config=debug
