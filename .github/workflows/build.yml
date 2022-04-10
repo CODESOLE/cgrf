@@ -16,8 +16,8 @@ jobs:
         with:
           msystem: MSYS
           update: true
-          run: ./install_dep_for_windowsmsys2_and_arch_linux.sh
+          install: pacman -S --needed --noconfirm base-devel mingw-w64-x86_64-{toolchain,premake,SDL2}
+
       - name: CI-Build
         run: |
-          set MSYSTEM=MINGW64
-          msys2 -c './build.sh'
+          ./build.sh
