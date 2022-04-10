@@ -107,6 +107,33 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
                NK_WINDOW_NO_SCROLLBAR)) {
     struct nk_command_buffer *canvas = nk_window_get_canvas(ctx);
     struct nk_rect total_space = nk_window_get_content_region(ctx);
+#if 0
+
+    nk_layout_space_begin(ctx, NK_STATIC, total_space.h, array_str_size(toks));
+    _draw_grid(ctx, scrolling, 32.0f, nk_rgb(50, 50, 50));
+    struct nk_style_item background = ctx->style.window.fixed_background;
+    ctx->style.window.fixed_background = nk_style_item_hide();
+    ctx->style.window.border_color = nk_rgba(0, 0, 0, 0);
+
+    ctx->style.window.spacing = nk_vec2(0, 0);
+    ctx->style.window.padding = nk_vec2(0, 0);
+
+    for (size_t i = 0; i < arr_node_size(nodes); ++i) {
+      node_s *n = arr_node_get(nodes, i);
+      if (nk_popup_begin(ctx, NK_POPUP_STATIC, "piemenu",
+                         NK_WINDOW_NO_SCROLLBAR, n->bound)) {
+        _draw_circle(canvas, n, nk_rgb(25, 25, 25));
+        struct nk_rect text_pos = {n->bound.x + 5, n->bound.y, n->bound.w,
+                                   n->bound.h};
+        nk_draw_text(canvas, text_pos, n->inner_text, strlen(n->inner_text),
+                     ctx->style.font, nk_rgb(255, 0, 0), nk_rgb(0, 255, 0));
+      }
+      nk_popup_end(ctx);
+    }
+    ctx->style.window.fixed_background = background;
+
+#else
+
     nk_layout_space_begin(ctx, NK_STATIC, total_space.h, array_str_size(toks));
 
     _draw_grid(ctx, scrolling, 32.0f, nk_rgb(50, 50, 50));
@@ -120,6 +147,7 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
                    ctx->style.font, nk_rgb(255, 0, 0), nk_rgb(0, 255, 0));
     }
 
+#endif
     if (nk_input_is_mouse_hovering_rect(in, nk_window_get_bounds(ctx)) &&
         nk_input_is_mouse_down(in, NK_BUTTON_MIDDLE)) {
       scrolling.x -= in->mouse.delta.x;
