@@ -24,5 +24,5 @@ Then just run `./build.sh` from root directory (No need for `./install_deps_for_
 
 # Build on MacOS
  - Install [Homebrew](https://brew.sh/)
- - Open terminal change directory to the root of this folder and then run `brew install sdl2 premake`
+ - Open terminal change directory to the root of this folder and then run `brew install gcc make sdl2 premake`
  - Finally, run `./build.sh` shell script to build the project. Binary build will be written in build directory.
