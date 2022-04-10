@@ -20,4 +20,4 @@ jobs:
       - name: CI-Build
         run: |
           set MSYSTEM=MINGW64
-          ./build.sh
+          msys2 -c './build.sh'
