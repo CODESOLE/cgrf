@@ -49,20 +49,21 @@ static void _draw_grid(struct nk_context *ctx, const struct nk_rect scrolling,
   for (float x = (float)fmod(size.x - scrolling.x, grid_size); x < size.w;
        x += grid_size)
     nk_stroke_line(canvas, x + size.x, size.y, x + size.x, size.y + size.h,
-                   1.0f, grid_color);
+                   0.5f, grid_color);
   for (float y = (float)fmod(size.y - scrolling.y, grid_size); y < size.h;
        y += grid_size)
     nk_stroke_line(canvas, size.x, y + size.y, size.x + size.w, y + size.y,
-                   1.0f, grid_color);
+                   0.5f, grid_color);
 }
 
 static uint32_t uid = 0;
 
 typedef struct node {
   const char *inner_text;
-  uint32_t id;
   struct nk_rect bound;
-  CGRF_PAD(4);
+  uint32_t id;
+  uint16_t conn_num;
+  CGRF_PAD(2);
 } node_s;
 
 ARRAY_DEF(arr_node, node_s, M_POD_OPLIST)
@@ -83,10 +84,11 @@ static inline void _draw_circle(struct nk_command_buffer *buf, node_s *n,
 static inline node_s _create_node(struct nk_style *style,
                                   const char *inner_text) {
   return (node_s){strndupl(inner_text, strlen(inner_text)),
-                  uid++,
                   (struct nk_rect){0.0f, 0.0f,
                                    _get_text_width(style, inner_text) + 10.0f,
                                    style->font->height},
+                  uid++,
+                  0,
                   {0}};
 }
 
@@ -109,7 +111,7 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
     struct nk_rect total_space = nk_window_get_content_region(ctx);
     nk_layout_space_begin(ctx, NK_STATIC, total_space.h, array_str_size(toks));
 
-    _draw_grid(ctx, scrolling, 32.0f, nk_rgb(50, 50, 50));
+    _draw_grid(ctx, scrolling, 30.0f, nk_rgb(60, 60, 60));
 
     struct nk_rect bounds;
     for (size_t i = 0; i < arr_node_size(nodes); ++i) {
@@ -121,8 +123,8 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
       if (nk_input_is_mouse_hovering_rect(in, nk_window_get_bounds(ctx)) &&
           nk_input_is_mouse_down(in, NK_BUTTON_MIDDLE)) {
         bounds = nk_layout_space_rect_to_local(ctx, n->bound);
-        bounds.x -= (scrolling.x / 1.0f);
-        bounds.y -= (scrolling.y / 1.0f);
+        bounds.x -= SDL_clamp(scrolling.x, -1.0f, 1.0f);
+        bounds.y -= SDL_clamp(scrolling.y, -1.0f, 1.0f);
         n->bound = nk_layout_space_rect_to_screen(ctx, bounds);
       }
 
