@@ -21,16 +21,16 @@
  *
  */
 
+#ifdef _WIN32
+#define SDL_MAIN_HANDLED
+#endif
+
 #include "common.h"
 #include "global.h"
 #include "parser.h"
 #include "render.h"
 #include "util.h"
 #include <stdio.h>
-
-#ifdef _WIN32
-#define SDL_MAIN_HANDLED
-#endif
 
 int main(int argc, char **argv) {
   struct array_str_s *toks = NULL;
