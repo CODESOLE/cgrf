@@ -14,4 +14,4 @@ jobs:
       run: sudo apt update && sudo apt  -y install libsdl2-dev premake4
       
     - name: Build
-      run: premake5 gmake2 && make -C build config=debug
+      run: premake4 gmake2 && make -C build config=debug
