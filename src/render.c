@@ -111,7 +111,7 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
 
     _draw_grid(ctx, scrolling, 32.0f, nk_rgb(50, 50, 50));
 
-    struct nk_rect bounds = {0.0f, 0.0f, 0.0f, 0.0f};
+    struct nk_rect bounds;
     for (size_t i = 0; i < arr_node_size(nodes); ++i) {
       node_s *n = arr_node_get(nodes, i);
       nk_layout_space_push(ctx, nk_rect(n->bound.x - scrolling.x,
