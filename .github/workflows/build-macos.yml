@@ -10,8 +10,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Setup premake
+      uses: abel0b/setup-premake@v2
+      with:
+        version: "5.0.0-beta1"
+
     - name: install-deps
-      run: brew install sdl2 premake
+      run: brew install sdl2
 
     - name: Build
       run: premake5 gmake2 && make -C build config=debug
