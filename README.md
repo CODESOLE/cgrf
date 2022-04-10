@@ -21,3 +21,8 @@ For other linux distributions you can install dependencies according to your pac
  - SDL2
 
 Then just run `./build.sh` from root directory (No need for `./install_deps_for_windowsmsys2_and_arch_linux.sh` other than arch linux like distributions)
+
+# Build on MacOS
+ - Install [Homebrew](https://brew.sh/)
+ - Open terminal change directory to the root of this folder and then run `brew install sdl2 premake`
+ - Finally, run `./build.sh` shell script to build the project. Binary build will be written in build directory.
