@@ -123,8 +123,8 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
       if (nk_input_is_mouse_hovering_rect(in, nk_window_get_bounds(ctx)) &&
           nk_input_is_mouse_down(in, NK_BUTTON_MIDDLE)) {
         bounds = nk_layout_space_rect_to_local(ctx, n->bound);
-        bounds.x -= SDL_clamp(scrolling.x, -1.0f, 1.0f);
-        bounds.y -= SDL_clamp(scrolling.y, -1.0f, 1.0f);
+        bounds.x -= NK_CLAMP(scrolling.x, -1.0f, 1.0f);
+        bounds.y -= NK_CLAMP(scrolling.y, -1.0f, 1.0f);
         n->bound = nk_layout_space_rect_to_screen(ctx, bounds);
       }
 
