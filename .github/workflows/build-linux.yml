@@ -17,6 +17,6 @@ jobs:
 
     - name: install-deps
       run: sudo apt update && sudo apt  -y install libsdl2-dev
-      
+
     - name: Build
       run: premake5 gmake2 && make -C build config=debug
