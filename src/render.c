@@ -56,14 +56,15 @@ static void _draw_grid(struct nk_context *ctx, const struct nk_rect scrolling,
                    0.5f, grid_color);
 }
 
-static uint32_t uid = 0;
+static uint16_t uid = 0;
 
 typedef struct node {
   const char *inner_text;
+  uint16_t conns[512];
   struct nk_rect bound;
-  uint32_t id;
+  uint16_t id;
   uint16_t conn_num;
-  CGRF_PAD(2);
+  CGRF_PAD(4);
 } node_s;
 
 ARRAY_DEF(arr_node, node_s, M_POD_OPLIST)
@@ -84,6 +85,7 @@ static inline void _draw_circle(struct nk_command_buffer *buf, node_s *n,
 static inline node_s _create_node(struct nk_style *style,
                                   const char *inner_text) {
   return (node_s){strndupl(inner_text, strlen(inner_text)),
+                  {0},
                   (struct nk_rect){0.0f, 0.0f,
                                    _get_text_width(style, inner_text) + 10.0f,
                                    style->font->height},
@@ -99,6 +101,12 @@ void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks) {
     n.bound.x = rand() % width;
     n.bound.y = rand() % height;
     arr_node_push_back(nodes, n);
+  }
+  for (size_t i = 0; i < arr_node_size(nodes); ++i) {
+    if (i + 1 < arr_node_size(nodes)) {
+      node_s *n = arr_node_get(nodes, i);
+      n->conns[n->conn_num++] = arr_node_get(nodes, i + 1)->id;
+    }
   }
 }
 
@@ -116,6 +124,20 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
     struct nk_rect bounds;
     for (size_t i = 0; i < arr_node_size(nodes); ++i) {
       node_s *n = arr_node_get(nodes, i);
+      node_s *n1 = NULL;
+      if (i + 1 < arr_node_size(nodes))
+        n1 = arr_node_get(nodes, i + 1);
+      else
+        n1 = arr_node_get(nodes, i);
+
+      struct nk_vec2 l0 =
+          nk_vec2(n->bound.x + n->bound.w / 2, n->bound.y + n->bound.h / 2);
+      struct nk_vec2 l1 =
+          nk_vec2(n1->bound.x + n1->bound.w / 2, n1->bound.y + n1->bound.h / 2);
+
+      nk_stroke_curve(canvas, l0.x, l0.y, l0.x + 50.0f, l0.y, l1.x - 50.0f,
+                      l1.y, l1.x, l1.y, 1.0f, nk_rgb(100, 100, 100));
+
       nk_layout_space_push(ctx, nk_rect(n->bound.x - scrolling.x,
                                         n->bound.y - scrolling.y, n->bound.w,
                                         n->bound.h));
@@ -123,8 +145,8 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
       if (nk_input_is_mouse_hovering_rect(in, nk_window_get_bounds(ctx)) &&
           nk_input_is_mouse_down(in, NK_BUTTON_MIDDLE)) {
         bounds = nk_layout_space_rect_to_local(ctx, n->bound);
-        bounds.x -= NK_CLAMP(scrolling.x, -1.0f, 1.0f);
-        bounds.y -= NK_CLAMP(scrolling.y, -1.0f, 1.0f);
+        bounds.x -= SDL_clamp(scrolling.x, -0.5f, 0.5f);
+        bounds.y -= SDL_clamp(scrolling.y, -0.5f, 0.5f);
         n->bound = nk_layout_space_rect_to_screen(ctx, bounds);
       }
 

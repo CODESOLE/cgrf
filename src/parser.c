@@ -80,7 +80,7 @@ struct array_str_s *cgrf_parse_file(const char *filename) {
   CGRF_FOPEN(f, filename, "r", exit(EXIT_FAILURE), __FILE__, __LINE__);
   char line[MAX_CHAR];
   while (!feof(f) && fgets(line, MAX_CHAR, f) != NULL) {
-    _tokenize(_trim_line(line), "->");
+    _tokenize(_trim_line(line), "--");
     for (size_t i = 0; i < array_str_size(t); i++)
       array_str_set_at(t, i, _trim_line(*array_str_get(t, i)));
   }
