@@ -9,13 +9,8 @@ project "cgrf"
   warnings "Extra"
   targetname "cgrf"
   targetdir "build"
-
-  os.mkdir("build")
-  os.copyfile("tests/test.cgrf", "build")
-  os.copyfile("tests/test_with_commented_lines.cgrf", "build")
-
+  prebuildcommands { "{RMDIR} tests", "{COPYDIR} ../tests tests" }
   buildoptions { "-pedantic" }
-
   includedirs { "src", "dep" }
   links { "SDL2main", "SDL2", "m" }
   files { "src/**.c", "dep/**.c" }
@@ -23,7 +18,6 @@ project "cgrf"
   filter "configurations:Debug"
     defines { "DEBUG" }
     symbols "On"
-
   filter "configurations:Release"
     defines { "NDEBUG" }
     optimize "On"
