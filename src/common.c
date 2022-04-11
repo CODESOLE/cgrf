@@ -42,7 +42,7 @@ static inline void _usage(void) {
        "\n"
        "--version           print version\n"
        "--help              print help\n"
-       "--file [filename]   specify file\n");
+       "--file=<filename>   specify file to visualize\n");
 }
 
 void cgrf_bg_clear_color(float r, float g, float b, float a) {
@@ -109,6 +109,14 @@ void cgrf_destroy_terminate_sdl(SDL_Window *window, SDL_GLContext glContext) {
 #define ARGS_HELP 1
 #define ARGS_VERSION 2
 
+static inline void _check_optarg_not_start_dash(const char *optarg) {
+  if (*optarg == '-') {
+    puts("Option argument should not start with '-'\n");
+    _usage();
+    exit(EXIT_FAILURE);
+  }
+}
+
 void cgrf_parse_cmdline_args(int argc, char **argv) {
   if (argc < 2) {
     _usage();
@@ -128,6 +136,7 @@ void cgrf_parse_cmdline_args(int argc, char **argv) {
       exit(EXIT_SUCCESS);
       break;
     case ARGS_FILE:
+      _check_optarg_not_start_dash(optarg);
       flag_file = 1;
       xstrlcpy(file, optarg, sizeof(file));
       printf("file to visualize: %s\n", file);
