@@ -8,9 +8,9 @@
       "program": "${workspaceFolder}/build/cgrf",
       "args": [
         "--file",
-        "./build/test.cgrf"
+        "./tests/test.cgrf"
       ],
-      "cwd": "${workspaceFolder}",
+      "cwd": "",
       "preLaunchTask": "Debug"
     },
     {
