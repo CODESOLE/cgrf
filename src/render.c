@@ -84,7 +84,7 @@ static inline void _draw_circle(struct nk_command_buffer *buf, node_s *n,
 
 static inline node_s _create_node(struct nk_style *style,
                                   const char *inner_text) {
-  return (node_s){strndupl(inner_text, strlen(inner_text)),
+  return (node_s){xstrndup(inner_text, strlen(inner_text)),
                   {0},
                   (struct nk_rect){0.0f, 0.0f,
                                    _get_text_width(style, inner_text) + 10.0f,

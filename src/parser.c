@@ -59,10 +59,10 @@ static void _tokenize(char *haystack, char *needle) {
   while (rett && *rett != '\n') {
     char *ret = strstr(rett, needle);
     if (!ret || *rett == '\0') {
-      array_str_push_back(t, strndupl(rett, strlen(rett)));
+      array_str_push_back(t, xstrndup(rett, strlen(rett)));
       break;
     }
-    array_str_push_back(t, strndupl(rett, ret - rett));
+    array_str_push_back(t, xstrndup(rett, ret - rett));
     if (*(ret + 1) == '\0' || *(ret + 2) == '\0')
       break;
     rett = ret + strlen(needle);

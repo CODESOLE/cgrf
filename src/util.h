@@ -42,8 +42,8 @@ size_t xstrlcpy(char *dst, const char *src, size_t siz);
  * If retval >= dsize, truncation occurred.
  */
 size_t xstrlcat(char *dst, const char *src, size_t siz);
-size_t strnlength(const char *s, size_t n);
-char *strndupl(const char *s, size_t n);
+size_t xstrnlen(const char *s, size_t n);
+char *xstrndup(const char *s, size_t n);
 
 #define CGRF_STRINGIFY(name) #name
 #define CGRF_CONCAT_IMPL(a, b) a##b

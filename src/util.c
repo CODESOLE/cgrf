@@ -24,13 +24,13 @@
 #include "util.h"
 #include <string.h>
 
-size_t strnlength(const char *s, size_t n) {
+size_t xstrnlen(const char *s, size_t n) {
   const char *found = memchr(s, '\0', n);
   return found ? (size_t)(found - s) : n;
 }
 
-char *strndupl(const char *s, size_t n) {
-  size_t len = strnlength(s, n);
+char *xstrndup(const char *s, size_t n) {
+  size_t len = xstrnlen(s, n);
   char *new = (char *)malloc(len + 1);
   if (new == NULL)
     return NULL;
