@@ -31,4 +31,6 @@ extern char file[MAX_FILE_NAME];
 extern _Bool flag_version, flag_help, flag_file, is_running;
 extern int width, height;
 
+#define SDL_clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
+
 #endif /* _CGRF_GLOBAL_H_ */
