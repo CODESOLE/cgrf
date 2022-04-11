@@ -98,8 +98,8 @@ void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks) {
   srand(time(NULL));
   for (size_t i = 0; i < array_str_size(toks); ++i) {
     node_s n = _create_node(style, *array_str_get(toks, i));
-    n.bound.x = rand() % width;
-    n.bound.y = rand() % height;
+    n.bound.x = SDL_clamp(rand() % width, 0.0f, width - 50.0f);
+    n.bound.y = SDL_clamp(rand() % height, 0.0f, height - 50.0f);
     arr_node_push_back(nodes, n);
   }
   for (size_t i = 0; i < arr_node_size(nodes); ++i) {
