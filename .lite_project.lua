@@ -42,7 +42,7 @@ command.add(nil, {
   ["project:build-project"] = function()
     core.log "Building..."
     console.run {
-      command = "./build.sh",
+      command = "./build.sh && ./build/cgrf --file ./build/tests/test.cgrf",
       file_pattern = "(.*):(%d+):(%d+): (.*)$",
       cwd = ".",
       on_complete = function(retcode) core.log("Build complete with return code "..retcode) end,
