@@ -303,7 +303,7 @@ M_BEGIN_PROTECTED_CODE
 
 
 /* If within the M*LIB tests, perform additional (potentialy slow) checks
- * By default, it is an encapsulation of CLIB assert.
+ * By default, it is an encapsulation of CLIB assert for M*LIB own tests.
  * NOTE: Can be overiden by user if it needs to keep finer access 
  * on the assertions.
  */
@@ -365,9 +365,10 @@ M_BEGIN_PROTECTED_CODE
    with an optional message detailling the error.
    NOTE: Use bitfield to be compatible with most compilers
    (so that it properly displays 'error' on the command line
-   NOTE: Cannot use C11 Static Assert as is not usable in expression.
+   It cannot use C11 Static Assert as is not usable in expression.
    NOTE: In C++, use of lambda to encapsulate static_assert in
    an expression.
+   NOTE: For GNU compatible compilers, uses of a GNU extension.
 */
 #if defined(__cplusplus)
 # define M_STATIC_ASSERT(cond, error, msg)                                    \
@@ -876,7 +877,7 @@ M_BEGIN_PROTECTED_CODE
 #define M_RET_ARG76(...) M_RETI_ARG76(__VA_ARGS__,)
 
 /* For a pair of argument (arg0, arg1), return either the first or the second.
-   Needed in case where M_RET_ARGn cannot be used */
+   NOTE: Needed in case where M_RET_ARGn cannot be used */
 #define M_PAIR_1(a,b) a
 #define M_PAIR_2(a,b) b
 
@@ -1026,12 +1027,23 @@ M_BEGIN_PROTECTED_CODE
 #define M_INVI_1                    0
 #define M_INV(x)                    M_C(M_INVI_, x)
 
-/* Perform a AND between the boolean inputs */
+/* Perform a AND between the two boolean inputs */
 #define M_ANDI_00                   0
 #define M_ANDI_01                   0
 #define M_ANDI_10                   0
 #define M_ANDI_11                   1
 #define M_AND(x,y)                  M_C3(M_ANDI_, x, y)
+
+/* Perform a AND between the three boolean inputs */
+#define M_ANDI_000                  0
+#define M_ANDI_001                  0
+#define M_ANDI_010                  0
+#define M_ANDI_011                  0
+#define M_ANDI_100                  0
+#define M_ANDI_101                  0
+#define M_ANDI_110                  0
+#define M_ANDI_111                  1
+#define M_AND3(x,y,z)               M_C4(M_ANDI_, x, y, z)
 
 /* Perform a OR between the boolean inputs */
 #define M_ORI_00                    0
@@ -1039,6 +1051,17 @@ M_BEGIN_PROTECTED_CODE
 #define M_ORI_10                    1
 #define M_ORI_11                    1
 #define M_OR(x,y)                   M_C3(M_ORI_, x, y)
+
+/* Perform a OR between the three boolean inputs */
+#define M_ORI_000                   0
+#define M_ORI_001                   1
+#define M_ORI_010                   1
+#define M_ORI_011                   1
+#define M_ORI_100                   1
+#define M_ORI_101                   1
+#define M_ORI_110                   1
+#define M_ORI_111                   1
+#define M_OR3(x,y,z)                M_C4(M_ORI_, x, y, z)
 
 
 /* M_IF Macro : Perform an IF test at preprocessing time. 
@@ -1804,30 +1827,24 @@ M_BEGIN_PROTECTED_CODE
 #define M_IF_FUNCOBJ(a)             M_IF(M_FUNCOBJ_IS_NOT_DEFINED)( ,a)
 
 
-/* Helper macro to redefine a function with a default value :
-   If there is only one variable as the __VA_ARGS__, print
-   __VA_ARGS__ then ', value', instead only __VA_ARGS__.
-   Example:
-    int f(int a, int b);
-    #define f(...) M_APPLY(f, M_IF_DEFAULT1(0, __VA_ARGS__))
-   This need to be called within a M_APPLY macro.
-*/
-#define M_IF_DEFAULT1(value, ...)                                             \
-  __VA_ARGS__ M_IF_NARGS_EQ1(__VA_ARGS__)(M_DEFERRED_COMMA value, )
-
 /* Helper macro to redefine a function with a default values:
    Give the number of expected arguments, the value list of the
    default argument, and the arguments.
    It will complete the arguments with the value of the default
    argument to complete up to 'expected' arguments.
+   USAGE:
+   M_DEFAULT_ARGS(expected_num_of_args, (list_of_default_values), given_arguments...)
    Example:
    #define f(...) f(M_DEFAULT_ARGS(4, (0, 1, NULL), __VA_ARGS__))
 */
-#define M_DEFAULT_ARGS2(expected, value, ...)                                 \
-  __VA_ARGS__ M_IF(M_NOTEQUAL(M_NARGS(__VA_ARGS__), expected))(M_DEFERRED_COMMA, ) \
-    M_REVERSE(M_KEEP_ARGS(M_SUB(expected, M_NARGS(__VA_ARGS__)), M_REVERSE value))
-#define M_DEFAULT_ARGS_EVAL(...) __VA_ARGS__
-#define M_DEFAULT_ARGS( ...) M_DEFAULT_ARGS_EVAL(M_DEFAULT_ARGS2(__VA_ARGS__))
+#define M_DEFAULTI_ARGS2(numArgs, numExpected, value, ...)                    \
+  __VA_ARGS__                                                                 \
+  M_IF(M_NOTEQUAL(numArgs, numExpected))(M_DEFERRED_COMMA, )                  \
+  M_REVERSE(M_KEEP_ARGS(M_SUB(numExpected, numArgs), M_REVERSE value, nothing))
+#define M_DEFAULTI_ARGS_EVAL(...) __VA_ARGS__
+#define M_DEFAULT_ARGS(expected, value,  ...)                                 \
+  M_DEFAULTI_ARGS_EVAL(M_DEFAULTI_ARGS2(M_NARGS(__VA_ARGS__), expected, value, __VA_ARGS__))
+
 
 /* NOTEQUAL(val1,val2) with val from [0 to 52[
    Return 1 or 0 if val1=val2
@@ -2613,6 +2630,9 @@ static inline unsigned int m_core_clz64(uint64_t limb)
 /* Implement a kind of FNV1A Hash.
    Inspired by http://www.sanmayce.com/Fastest_Hash/ Jesteress and port to 64 bits.
    See https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash
+   The buffer given as argument shall be aligned:
+   - to 8 (resp. 4) if size is greater than 8 on 64 bits (resp. 4 on 32 bits),
+   - to the power of 2 just lower or equal to its size otherwise.
    NOTE: A lot of cast. Not really type nor alignement safe.
    NOTE: Can be reduced to very few instructions if constant size argument.
    FIXME: It is trivial for an attacker to generate collision and HASH_SEED doesn't prevent it.
@@ -2628,7 +2648,9 @@ m_core_hash (const void *str, size_t length)
 
   M_ASSERT (str != NULL || length == 0);
   M_ASSERT ( (( (uintptr_t)p & (sizeof(uint32_t)-1) ) == 0) || (length <= sizeof(uint32_t)));
+  M_ASSERT ( (( (uintptr_t)p & (sizeof(uint16_t)-1) ) == 0) || (length <= sizeof(uint16_t)));
 
+  // Main loop that handles 64 bits at a time.
   while (length >= 2*sizeof(uint32_t)) {
     const uint32_t *ptr = (const uint32_t *) (uintptr_t) p;
     hash32 = (hash32 ^ (m_core_rotl32a(ptr[0], 5) ^ ptr[1])) * prime;
@@ -2661,7 +2683,10 @@ m_core_hash (const void *str, size_t length)
 
   M_ASSERT (str != NULL || length == 0);
   M_ASSERT ( (( (uintptr_t)p & (sizeof(uint64_t)-1) ) == 0) || (length <= sizeof(uint32_t)));
+  M_ASSERT ( (( (uintptr_t)p & (sizeof(uint32_t)-1) ) == 0) || (length <= sizeof(uint32_t)));
+  M_ASSERT ( (( (uintptr_t)p & (sizeof(uint16_t)-1) ) == 0) || (length <= sizeof(uint16_t)));
 
+  // Main loop that handles 128 bits at a time.
   while (length >= 2*sizeof(uint64_t)) {
     const uint64_t *ptr = (const uint64_t *) (uintptr_t) p;
     hash64 = (hash64 ^ (m_core_rotl64a(ptr[0], 5) ^ ptr[1])) * prime;
@@ -2691,7 +2716,10 @@ m_core_hash (const void *str, size_t length)
 }
 #endif
 
-/* HASH function for a C-string (to be used within oplist) */
+/* HASH function for a C-string (to be used within oplist)
+ * We cannot use m_core_hash due to the alignment constraint,
+ * and it avoids computing the size before computing the hash.
+ */
 static inline size_t m_core_cstr_hash(const char str[])
 {
   M_HASH_DECL(hash);
@@ -3106,14 +3134,32 @@ static inline size_t m_core_cstr_hash(const char str[])
 /* Test if the given variable is a basic C variable:
    int, float, enum, bool or compatible.
    NOTE: Not perfect, but catch some errors */
-#define M_CHECK_DEFAULT_TYPE(a)                                               \
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define M_CHECK_BASIC_TYPE(a)                                                 \
+  M_STATIC_ASSERT(_Generic(a,                                                 \
+                           _Bool: 1,                                          \
+                           char: 1, unsigned char: 1, signed char: 1,         \
+                           unsigned short: 1, signed short: 1,                \
+                           unsigned int: 1, signed int: 1,                    \
+                           unsigned long: 1, signed long: 1,                  \
+                           unsigned long long: 1, signed long long:1,         \
+                           float: 1, double:1, long double: 1,                \
+                           char *:1, void*:1,                                 \
+                  default: 0),                                                \
+                  M_LIB_NOT_A_BASIC_TYPE,                                     \
+                  "The variable " M_AS_STR(a) " is not a basic C type (int/float), " \
+                  "but the given methods use it like this. "                  \
+                  "It is likely the given oplist is not right.")
+#else
+#define M_CHECK_BASIC_TYPE(a)                                                 \
   M_STATIC_ASSERT(sizeof (a) <= M_MAX(sizeof(long long),                      \
-                                M_MAX(sizeof (long double),                   \
-                                      sizeof (uintmax_t))),                   \
-      M_LIB_NOT_A_DEFAULT_TYPE,                                               \
-      "The given variable is too big to be a default type,"                   \
-      "but the used macro can only be used with such one."                    \
-      "It is likely the given oplist is not right.")
+                                      M_MAX(sizeof (long double),             \
+                                            sizeof (uintmax_t))),             \
+                  M_LIB_NOT_A_BASIC_TYPE,                                     \
+                  "The variable " M_AS_STR(a) " is too big to be a basic C type (int/float), " \
+                  "but the given methods use it like this. "                  \
+                  "It is likely the given oplist is not right.")
+#endif
 
 /* Check if both variables are of the same type.
    The test compare their size.
@@ -3173,7 +3219,7 @@ static inline size_t m_core_cstr_hash(const char str[])
    are different but compatible type.
  */
 #define M_INIT_DEFAULT(a)       ((a) = 0)
-#define M_SET_DEFAULT(a,b)      (M_CHECK_DEFAULT_TYPE(a), (a) = (b))
+#define M_SET_DEFAULT(a,b)      ((a) = (b))
 #define M_NOTHING_DEFAULT(...)  ((void)(__VA_ARGS__))
 #define M_EMPTY_DEFAULT(...)    ((void)1)
 #define M_TRUE_DEFAULT(...)     true
@@ -3191,6 +3237,13 @@ static inline size_t m_core_cstr_hash(const char str[])
 #define M_OR_DEFAULT(a,b,c)     ((a) = (b) | (c))
 #define M_NO_EXT_ALGO(n,co,to)
 #define M_INC_ALLOC_DEFAULT(n)   (M_MAX(8, (n))*2)
+
+/* Define the method for basic types */
+/* Check that the type matches a C basic type and do the job */
+#define M_INIT_BASIC(a)         (M_CHECK_BASIC_TYPE(a), (a) = 0)
+#define M_SET_BASIC(a,b)        (M_CHECK_BASIC_TYPE(a), (a) = (b))
+#define M_EQUAL_BASIC(a,b)      (M_CHECK_BASIC_TYPE(a), (a) == (b))
+#define M_CMP_BASIC(a,b)        (M_CHECK_BASIC_TYPE(a), (a) < (b) ? -1 : (a) > (b))
 
 /* Define the default limits:
  * - default maximum size of the basic type in "limb"
@@ -3266,11 +3319,11 @@ static inline size_t m_core_cstr_hash(const char str[])
 
 # if M_USE_STDIO
 /* C11 + FILE support */
-#  define M_DEFAULT_OPLIST                                                    \
-  (INIT(M_INIT_DEFAULT), INIT_SET(M_SET_DEFAULT), SET(M_SET_DEFAULT),         \
-   CLEAR(M_NOTHING_DEFAULT), EQUAL(M_EQUAL_DEFAULT), CMP(M_CMP_DEFAULT),      \
+#  define M_BASIC_OPLIST                                                      \
+  (INIT(M_INIT_BASIC), INIT_SET(M_SET_BASIC), SET(M_SET_BASIC),               \
+   CLEAR(M_NOTHING_DEFAULT), EQUAL(M_EQUAL_BASIC), CMP(M_CMP_BASIC),          \
    INIT_MOVE(M_MOVE_DEFAULT), MOVE(M_MOVE_DEFAULT) ,                          \
-   RESET(M_INIT_DEFAULT),                                                     \
+   RESET(M_INIT_BASIC),                                                       \
    ADD(M_ADD_DEFAULT), SUB(M_SUB_DEFAULT),                                    \
    MUL(M_MUL_DEFAULT), DIV(M_DIV_DEFAULT),                                    \
    HASH(M_HASH_DEFAULT), SWAP(M_SWAP_DEFAULT) ,                               \
@@ -3279,11 +3332,11 @@ static inline size_t m_core_cstr_hash(const char str[])
    PARSE_STR(M_PARSE_DEFAULT_TYPE M_IPTR), M_GET_STR_METHOD_FOR_DEFAULT_TYPE)
 # else
 /* C11 + No FILE support */
-#   define M_DEFAULT_OPLIST                                                   \
-  (INIT(M_INIT_DEFAULT), INIT_SET(M_SET_DEFAULT), SET(M_SET_DEFAULT),         \
-   CLEAR(M_NOTHING_DEFAULT), EQUAL(M_EQUAL_DEFAULT), CMP(M_CMP_DEFAULT),      \
+#   define M_BASIC_OPLIST                                                     \
+  (INIT(M_INIT_BASIC), INIT_SET(M_SET_BASIC), SET(M_SET_BASIC),               \
+   CLEAR(M_NOTHING_DEFAULT), EQUAL(M_EQUAL_BASIC), CMP(M_CMP_BASIC),          \
    INIT_MOVE(M_MOVE_DEFAULT), MOVE(M_MOVE_DEFAULT) ,                          \
-   RESET(M_INIT_DEFAULT),                                                     \
+   RESET(M_INIT_BASIC),                                                       \
    ADD(M_ADD_DEFAULT), SUB(M_SUB_DEFAULT),                                    \
    MUL(M_MUL_DEFAULT), DIV(M_DIV_DEFAULT),                                    \
    HASH(M_HASH_DEFAULT), SWAP(M_SWAP_DEFAULT) ,                               \
@@ -3292,28 +3345,30 @@ static inline size_t m_core_cstr_hash(const char str[])
 # endif
 #else
 /* C99 */
-# define M_DEFAULT_OPLIST                                                     \
-  (INIT(M_INIT_DEFAULT), INIT_SET(M_SET_DEFAULT), SET(M_SET_DEFAULT),         \
-   CLEAR(M_NOTHING_DEFAULT), EQUAL(M_EQUAL_DEFAULT), CMP(M_CMP_DEFAULT),      \
+# define M_BASIC_OPLIST                                                       \
+  (INIT(M_INIT_BASIC), INIT_SET(M_SET_BASIC), SET(M_SET_BASIC),               \
+   CLEAR(M_NOTHING_DEFAULT), EQUAL(M_EQUAL_BASIC), CMP(M_CMP_BASIC),          \
    INIT_MOVE(M_MOVE_DEFAULT), MOVE(M_MOVE_DEFAULT) ,                          \
-   RESET(M_INIT_DEFAULT),                                                     \
+   RESET(M_INIT_BASIC),                                                       \
    ADD(M_ADD_DEFAULT), SUB(M_SUB_DEFAULT),                                    \
    MUL(M_MUL_DEFAULT), DIV(M_DIV_DEFAULT),                                    \
    HASH(M_HASH_DEFAULT), SWAP(M_SWAP_DEFAULT)                         )
 #endif
 
+/* Obsolete name */
+#define M_DEFAULT_OPLIST M_BASIC_OPLIST
 
 /* Specialized oplist for a boolean.
- * M_DEFAULT_OPLIST is nearly ok, except for ADD/SUB/MUL/DIV
+ * M_BASIC_OPLIST is nearly ok, except for ADD/SUB/MUL/DIV
  * that generates warnings with boolean.
  */
 #define M_BOOL_OPLIST                                                         \
-  M_OPEXTEND(M_DEFAULT_OPLIST, ADD(M_OR_DEFAULT), MUL(M_AND_DEFAULT),         \
+  M_OPEXTEND(M_BASIC_OPLIST, ADD(M_OR_DEFAULT), MUL(M_AND_DEFAULT),           \
               SUB(0), DIV(0))
 
 
 /* Specialized oplist for an enumerate.
- * M_DEFAULT_OPLIST is nearly ok, except if build in C++ mode.
+ * M_BASIC_OPLIST is nearly ok, except if build in C++ mode.
  * Also I/O are specialized and arithmetics are removed
  * OPLIST doesn't store an oplist but an additional parameter
  * (the initial value)
@@ -3528,8 +3583,10 @@ m_core_parse2_enum (const char str[], const char **endptr)
                                    ));                                        \
   } while (0)
 
-/* Test if the argument is a valid oplist.
-   NOTE: Incomplete test.
+/* Test if the argument is an expression that looks like an oplist:
+ * - the data are within parenthesis
+ * - there is only one level of parenthesis
+ * The detection is imperfect.
 */
 #define M_OPLIST_P(a)                                                         \
   M_AND(M_PARENTHESIS_P(a), M_INV(M_PARENTHESIS_P (M_OPFLAT a)))
@@ -3538,58 +3595,51 @@ m_core_parse2_enum (const char str[], const char **endptr)
 
 /* If 'a' seems to be an oplist, it returns a,
    else if a symbol composed of M_OPL_##a() exists and is defined as an oplist, it returns it
-   else it returns a.
+   else it returns a (but it is likely to fail latter).
    In short, if a global oplist is defined for the argument, it returns it
    otherwise it returns the argument.
    Global oplist is limited to typedef types.
+   We need to delay the concat between M_OPL_ and a until we know it cannot be an oplist
+   as if a is an oplist the concat of M_OPL_ and an oplist will produce an illegal token.
 */
 #define M_GLOBAL_OPLIST(a)                                                    \
-  M_IF( M_OPLIST_P(a))(M_GLOBALI_ID, M_GLOBALI_OPLIST_ELSE)(a)
-#define M_GLOBALI_ID(a)                     a
+  M_IF( M_OPLIST_P(a))(M_GLOBALI_OPLIST_ID, M_GLOBALI_OPLIST_ELSE)(a)
+#define M_GLOBALI_OPLIST_ID(a)              a
 #define M_GLOBALI_OPLIST_ELSE(a)            M_GLOBALI_OPLIST_ELSE2(a, M_C(M_OPL_, a)())
 #define M_GLOBALI_OPLIST_ELSE2(a, op)       M_IF( M_OPLIST_P (op))(op, a)
 
 #define M_GLOBAL_TYPE(a)                                                      \
-  M_IF( M_OPLIST_P(a))(M_GLOBALI_TYPE_GET, M_GLOBALI_ID)(a)
+  M_IF( M_OPLIST_P(a))(M_GLOBALI_TYPE_GET, M_GLOBALI_OPLIST_ID)(a)
 #define M_GLOBALI_TYPE_GET(a)              M_GET_TYPE a
 
 /* If a symbol composed of M_OPL_##a() exists and is defined as an oplist,
-   it returns it otherwise it returns M_DEFAULT_OPLIST.
+   it returns it otherwise it returns M_BASIC_OPLIST.
    Global oplist is limited to typedef types.
    NOTE1: It first tests if the type doesn't start with a parenthesis,
    in which case concatenation cannot be used.
    NOTE: It doesn't test if M_OPL_##a() is exactly an oplist (M_OPLIST_P)
    but rather than if it starts with parenthesis: this is to allow
    M_OPL_a() to expand into an invalid oplist ((M_LIB_ERRROR()))
+   NOTE: The result of this macro shall be evaluated like this:
+       M_GLOBAL_OPLIST_OR_DEF(type)()
 */
 #define M_GLOBAL_OPLIST_OR_DEF(a)                                             \
   M_IF( M_PARENTHESIS_P(a))(M_GLOBALI_OPLIST_DEFAULT1, M_GLOBALI_OPLIST_OR_DEF_ELSE)(a)
 #define M_GLOBALI_OPLIST_DEFAULT1(a)          M_GLOBALI_OPLIST_DEFAULT2
-#define M_GLOBALI_OPLIST_DEFAULT2()           M_DEFAULT_OPLIST
+#define M_GLOBALI_OPLIST_DEFAULT2()           M_BASIC_OPLIST
 #define M_GLOBALI_OPLIST_OR_DEF_ELSE(a)       M_GLOBALI_OPLIST_OR_DEF_ELSE2(a, M_C(M_OPL_, a)())
 #define M_GLOBALI_OPLIST_OR_DEF_ELSE2(a, op)  M_IF( M_PARENTHESIS_P(op))(M_C(M_OPL_, a), M_GLOBALI_OPLIST_DEFAULT2)
 
 
-/* Register simple classic C types (no qualifier) */
-#define M_OPL_char() M_DEFAULT_OPLIST
-#define M_OPL_short() M_DEFAULT_OPLIST
-#define M_OPL_int() M_DEFAULT_OPLIST
-#define M_OPL_long() M_DEFAULT_OPLIST
-#define M_OPL_float() M_DEFAULT_OPLIST
-#define M_OPL_double() M_DEFAULT_OPLIST
-
-/* Add as suffix for the given function the number of arguments of the calls.
-   Can be used to call different function in function of the number of arguments. */
-#define M_SUFFIX_FUNCTION_BY_NARGS(function, ...) M_C3(function, _, M_NARGS(__VA_ARGS__))
-
-/* Call different INIT_WITH method in function of the number of arguments of the call,
- * to be used in an OPLIST.
- * Shall be used with API_1 call (example INIT_WITH(API_1(M_INIT_WITH_NVAR)) )
- * Shall define a NAME base method
- * All INIT_WITH methods shall be named as name ## _init_with_ ## NARGS
+/* Register simple classic C types (no qualifier)
+ * We cannot register type with qualifier (for example long long) however.
  */
-#define M_INIT_WITH_NVAR(oplist, ...)                                         \
-  M_SUFFIX_FUNCTION_BY_NARGS(M_C(M_GET_NAME oplist, _init_with), __VA_ARGS__)(__VA_ARGS__)
+#define M_OPL_char() M_BASIC_OPLIST
+#define M_OPL_short() M_BASIC_OPLIST
+#define M_OPL_int() M_BASIC_OPLIST
+#define M_OPL_long() M_BASIC_OPLIST
+#define M_OPL_float() M_BASIC_OPLIST
+#define M_OPL_double() M_BASIC_OPLIST
 
 
 /************************************************************/
@@ -3740,6 +3790,25 @@ m_core_parse2_enum (const char str[], const char **endptr)
       for( (void) 0; cont; cont = false)                                      \
 
 
+
+/************************************************************/
+/******************* INIT_WITH Enhancing ********************/
+/************************************************************/
+
+/* Add as suffix for the given function the number of arguments of the calls.
+   Can be used to call different function in function of the number of arguments. */
+#define M_SUFFIX_FUNCTION_BY_NARGS(function, ...) M_C3(function, _, M_NARGS(__VA_ARGS__))
+
+/* Call different INIT_WITH method in function of the number of arguments of the call,
+ * to be used in an OPLIST.
+ * Shall be used with API_1 call (example INIT_WITH(API_1(M_INIT_WITH_NVAR)) )
+ * Shall define a NAME base method
+ * All INIT_WITH methods shall be named as name ## _init_with_ ## NARGS
+ */
+#define M_INIT_WITH_NVAR(oplist, ...)                                         \
+  M_SUFFIX_FUNCTION_BY_NARGS(M_C(M_GET_NAME oplist, _init_with), __VA_ARGS__)(__VA_ARGS__)
+
+
 /* Initialize the container 'dest' as per 'oplist' INIT operator
    and fill it with the given VA arguments with the PUSH operator.
    NOTE: If the REVERSE operator exists, it assumes a list,
@@ -3777,6 +3846,7 @@ m_core_parse2_enum (const char str[], const char **endptr)
     (void) M_C(M_GET_NAME op, _push_raw)(d),                                  \
     M_IF(M_PARENTHESIS_P( a ))(M_CALL_INIT_WITH, M_CALL_INIT_SET)(M_GET_OPLIST op, *M_C( M_GET_NAME op , _back)(d), M_REMOVE_PARENTHESIS (a)) \
   )
+
 
 /* Initialize the container 'dest' as per 'oplist' INIT operator
    and fill it with the given VA argument
