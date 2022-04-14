@@ -33,7 +33,7 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-  struct array_str_s *toks = NULL;
+  struct dict_string_s *toks = NULL;
   SDL_GLContext gl_ctx = NULL;
   cgrf_parse_cmdline_args(argc, argv);
 
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     cgrf_app_routine(win, &width, &height);
   }
   cgrf_destroy_terminate_sdl(win, gl_ctx);
-  array_str_clear(toks);
+  dict_string_clear(toks);
 
   return 0;
 }
