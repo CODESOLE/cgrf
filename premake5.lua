@@ -9,7 +9,7 @@ project "cgrf"
   warnings "Extra"
   targetname "cgrf"
   targetdir "build"
-  prebuildcommands { "{RMDIR} tests", "{COPYDIR} ../tests tests" }
+  prebuildcommands {"rm -rf tests", "cp -rf ../tests tests"}
   buildoptions { "-pedantic" }
   includedirs { "src", "dep" }
   links { "SDL2main", "SDL2", "m" }
