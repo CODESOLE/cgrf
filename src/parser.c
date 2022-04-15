@@ -98,8 +98,6 @@ struct dict_string_s *cgrf_parse_file(const char *filename) {
     if (m_string_cmp(s1, s2) != 0)
       dict_string_set_at(token_strings, s1, s2);
   }
-  for (size_t i = 0; i < array_str_size(t); i++)
-    printf("%s\n", *array_str_get(t, i));
   dict_string_out_str(stdout, token_strings);
   puts("");
   array_str_clear(t);

@@ -122,6 +122,8 @@ void cgrf_calculate_node_pos(struct nk_style *style,
       arr_node_push_back(nodes, n2);
     }
   }
+  for (size_t i = 0; i < arr_node_size(nodes); ++i)
+    printf("%s\n", arr_node_get(nodes, i)->inner_text);
   for (size_t i = 0; i < arr_node_size(nodes) - 1; ++i) {
     node_s *n = arr_node_get(nodes, i);
     n->conns[n->conn_num++] = arr_node_get(nodes, i + 1)->id;
