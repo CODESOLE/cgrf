@@ -103,24 +103,13 @@ static node_s *_is_node_exist(const char *name) {
   return n;
 }
 
-void cgrf_calculate_node_pos(struct nk_style *style,
-                             struct dict_string_s *toks) {
+void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks) {
   srand(time(NULL));
-  dict_string_it_t it;
-  for (dict_string_it(it, toks); !dict_string_end_p(it); dict_string_next(it)) {
-    if (!_is_node_exist(m_string_get_cstr(dict_string_ref(it)->key)) &&
-        !_is_node_exist(m_string_get_cstr(dict_string_ref(it)->value))) {
-      node_s n =
-          _create_node(style, m_string_get_cstr(dict_string_ref(it)->key));
-      node_s n2 =
-          _create_node(style, m_string_get_cstr(dict_string_ref(it)->value));
-      n.bound.x = SDL_clamp(rand() % width, 0.0f, width - 50.0f);
-      n.bound.y = SDL_clamp(rand() % height, 0.0f, height - 50.0f);
-      n2.bound.x = SDL_clamp(rand() % width, 0.0f, width - 50.0f);
-      n2.bound.y = SDL_clamp(rand() % height, 0.0f, height - 50.0f);
-      arr_node_push_back(nodes, n);
-      arr_node_push_back(nodes, n2);
-    }
+  for (size_t i = 0; i < array_str_size(toks); ++i) {
+    node_s n = _create_node(style, *array_str_get(toks, i));
+    n.bound.x = SDL_clamp(rand() % width, 0.0f, width - 50.0f);
+    n.bound.y = SDL_clamp(rand() % height, 0.0f, height - 50.0f);
+    arr_node_push_back(nodes, n);
   }
   for (size_t i = 0; i < arr_node_size(nodes); ++i)
     printf("%s\n", arr_node_get(nodes, i)->inner_text);
@@ -130,7 +119,7 @@ void cgrf_calculate_node_pos(struct nk_style *style,
   }
 }
 
-void cgrf_render_graph(struct nk_context *ctx, struct dict_string_s *toks) {
+void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
   static struct nk_rect scrolling = {0};
   struct nk_input *in = &ctx->input;
   if (nk_begin(ctx, "Graph Viewer", nk_rect(0, 0, width, height),
@@ -138,7 +127,7 @@ void cgrf_render_graph(struct nk_context *ctx, struct dict_string_s *toks) {
     struct nk_command_buffer *canvas = nk_window_get_canvas(ctx);
     struct nk_rect total_space = nk_window_get_content_region(ctx);
     nk_layout_space_begin(ctx, NK_STATIC, total_space.h,
-                          dict_string_size(toks) * 2);
+                          array_str_size(toks) * 2);
 
     _draw_grid(ctx, scrolling, 30.0f, nk_rgb(60, 60, 60));
 

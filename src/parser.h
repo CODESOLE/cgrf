@@ -25,10 +25,9 @@
 #define _PARSER_H_
 
 #include "mlib/m-array.h"
-#include "mlib/m-dict.h"
 #include "mlib/m-string.h"
 
-DICT_DEF2(dict_string, string_t, string_t)
+ARRAY_DEF(array_str, char *)
 
 #define MAX_CHAR 4096
 
@@ -38,6 +37,6 @@ DICT_DEF2(dict_string, string_t, string_t)
  * @param filename file to be parsed with the .cgrf extension
  * @return struct dict_string_s* tokenized strings
  */
-struct dict_string_s *cgrf_parse_file(const char *filename);
+struct array_str_s *cgrf_parse_file(const char *filename);
 
 #endif /* _PARSER_H_ */

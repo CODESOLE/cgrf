@@ -55,7 +55,7 @@ void cgrf_set_font(struct nk_context *ctx, const char *file_name);
  * @param ctx nuklear context
  * @param toks tokens
  */
-void cgrf_render_graph(struct nk_context *ctx, struct dict_string_s *toks);
+void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks);
 
 /**
  * @brief calculates the position of the nodes
@@ -63,7 +63,6 @@ void cgrf_render_graph(struct nk_context *ctx, struct dict_string_s *toks);
  * @param style nuklear style
  * @param toks tokens
  */
-void cgrf_calculate_node_pos(struct nk_style *style,
-                             struct dict_string_s *toks);
+void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks);
 
 #endif /* _CGRF_RENDER_H */
