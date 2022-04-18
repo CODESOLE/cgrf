@@ -33,7 +33,7 @@ static char *_trim_line(char *line) {
   char *is_comment = strchr(line, '#');
   if (is_comment)
     *is_comment = '\0';
-  while (*line != '\0' && *line != '\n') {
+  while (*line != '\0') {
     if (isspace(*line))
       line++;
     else
@@ -51,8 +51,10 @@ static char *_trim_line(char *line) {
 }
 
 static array_str_t t = ARRAY_INIT_VALUE();
+static int line_num = 0; /**< Indicates active line */
 
 static void _tokenize(char *haystack, char *needle) {
+  short i = 0;
   if (strncmp(haystack, "", 1) == 0)
     return;
   char *rett = haystack;
@@ -60,12 +62,18 @@ static void _tokenize(char *haystack, char *needle) {
     char *ret = strstr(rett, needle);
     if (!ret || *rett == '\0') {
       array_str_push_back(t, xstrndup(rett, strlen(rett)));
+      i++;
       break;
     }
+    i++;
     array_str_push_back(t, xstrndup(rett, ret - rett));
     if (*(ret + 1) == '\0' || *(ret + 2) == '\0')
       break;
     rett = ret + strlen(needle);
+  }
+  if (i != 2 && i != 0) {
+    printf("[ERROR AT LINE %d ] Each line should contain 2 node!\n", line_num);
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -80,6 +88,7 @@ struct array_str_s *cgrf_parse_file(const char *filename) {
   CGRF_FOPEN(f, filename, "r", exit(EXIT_FAILURE), __FILE__, __LINE__);
   char line[MAX_CHAR];
   while (!feof(f) && fgets(line, MAX_CHAR, f) != NULL) {
+    line_num++;
     _tokenize(_trim_line(line), "--");
     for (size_t i = 0; i < array_str_size(t); i++)
       array_str_set_at(t, i, _trim_line(*array_str_get(t, i)));
