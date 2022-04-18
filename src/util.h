@@ -95,6 +95,12 @@ char *xstrndup(const char *s, size_t n);
     p = NULL;                                                                  \
   } while (0)
 
+#define CGRF_FAIL_IF_WRONG(x, file_name, line, action)                         \
+  if (!(x)) {                                                                  \
+    fprintf(stderr, "ASSERT [%s::%d]\n", file_name, line);                     \
+    action;                                                                    \
+  }
+
 #define CGRF_UNUSED(expr)                                                      \
   do {                                                                         \
     (void)(expr);                                                              \
