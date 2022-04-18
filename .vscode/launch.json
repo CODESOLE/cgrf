@@ -7,7 +7,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/build/cgrf",
       "args": [
-        "--file=./tests/test4.cgrf"
+        "--file=./tests/test5.cgrf"
       ],
       "cwd": "",
       "preLaunchTask": "Debug"
