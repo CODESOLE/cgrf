@@ -24,6 +24,7 @@
 #include "parser.h"
 #include "global.h"
 #include "util.h"
+#include <SDL2/SDL.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,10 +94,19 @@ struct array_str_s *cgrf_parse_file(const char *filename) {
     for (size_t i = 0; i < array_str_size(t); i++)
       array_str_set_at(t, i, _trim_line(*array_str_get(t, i)));
   }
-  for (size_t i = 0; i < array_str_size(t) - 1; ++i)
-    if (strncmp(*array_str_get(t, i), *array_str_get(t, i + 1),
-                strlen(*array_str_get(t, i + 1))) == 0)
-      array_str_erase(t, i + 1);
+  for (size_t i = 0; i < array_str_size(t); i++)
+    printf("%s\n", *array_str_get(t, i));
+  for (size_t i = 0; i < array_str_size(t); i += 2) {
+    char *s1 = *array_str_get(t, i);
+    char *s2 = *array_str_get(t, i + 1);
+    if (strncmp(s1, s2, strlen(s2)) == 0) {
+      if (i == 0)
+        array_str_erase(t, SDL_min(0, i - 1));
+      else
+        array_str_erase(t, i - 1);
+      array_str_erase(t, i);
+    }
+  }
 
   return t;
 }
