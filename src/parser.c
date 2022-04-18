@@ -120,8 +120,6 @@ struct array_str_s *cgrf_parse_file(const char *filename) {
     for (size_t i = 0; i < array_str_size(t); i++)
       array_str_set_at(t, i, _trim_line(*array_str_get(t, i)));
   }
-  for (size_t i = 0; i < array_str_size(t); i++)
-    printf("%s\n", *array_str_get(t, i));
   for (size_t i = 0; i < array_str_size(t); i += 2) {
     char *s1 = *array_str_get(t, i);
     char *s2 = *array_str_get(t, i + 1);
@@ -132,6 +130,9 @@ struct array_str_s *cgrf_parse_file(const char *filename) {
   }
   /* removing { A--B, B--A } and { A--B, A--B } */
   _check_remove_duplicated_and_revese_pairs(t);
+
+  for (size_t i = 0; i < array_str_size(t); i += 2)
+    printf("-(%s, %s)-\n", *array_str_get(t, i), *array_str_get(t, i + 1));
 
   return t;
 }
