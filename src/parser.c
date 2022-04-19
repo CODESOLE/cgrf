@@ -99,7 +99,10 @@ _check_remove_duplicated_and_revese_pairs(struct array_str_s *toks) {
       char *ss1 = *array_str_get(toks, j);
       char *ss2 = *array_str_get(toks, j + 1);
       snprintf(tmp2, 512, "%s%s", ss1, ss2);
-      if (strncmp(tmp, tmp2, strlen(tmp2)) == 0) {
+      char reverse[512];
+      snprintf(reverse, 512, "%s%s", ss2, ss1);
+      if (strncmp(tmp, tmp2, strlen(tmp2)) == 0 ||
+          strncmp(tmp, reverse, strlen(reverse)) == 0) {
         array_str_erase(toks, j);
         array_str_erase(toks, j);
       }
@@ -130,9 +133,6 @@ struct array_str_s *cgrf_parse_file(const char *filename) {
   }
   /* removing { A--B, B--A } and { A--B, A--B } */
   _check_remove_duplicated_and_revese_pairs(t);
-
-  for (size_t i = 0; i < array_str_size(t); i += 2)
-    printf("-(%s, %s)-\n", *array_str_get(t, i), *array_str_get(t, i + 1));
 
   return t;
 }
