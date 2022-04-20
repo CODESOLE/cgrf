@@ -23,6 +23,7 @@
 
 #include "render.h"
 #include "mlib/m-array.h"
+#include "util.h"
 #include <stdio.h>
 #include <time.h>
 
@@ -56,45 +57,54 @@ static void _draw_grid(struct nk_context *ctx, const struct nk_rect scrolling,
                    0.5f, grid_color);
 }
 
-static uint16_t uid = 0;
-
 typedef struct node {
   const char *inner_text;
-  uint16_t conns[512];
   struct nk_rect bound;
-  uint16_t id;
-  uint16_t conn_num;
-  CGRF_PAD(4);
+  CGRF_PAD(6);
 } node_s;
 
 ARRAY_DEF(arr_node, node_s, M_POD_OPLIST)
-
 static arr_node_t nodes = ARRAY_INIT_VALUE();
+
+static array_str_t visited_nodes = ARRAY_INIT_VALUE();
 
 static inline float _get_text_width(struct nk_style *style, const char *text) {
   return style->font->width(style->font->userdata, style->font->height, text,
                             strlen(text));
 }
 
-static inline void _draw_circle(struct nk_command_buffer *buf, node_s *n,
-                                struct nk_color col) {
+static inline void _draw_node(struct nk_context *ctx, node_s *n,
+                              struct nk_color col) {
+  struct nk_command_buffer *buf = nk_window_get_canvas(ctx);
   nk_fill_circle(buf, n->bound, col);
   nk_stroke_circle(buf, n->bound, 0.1f, nk_rgb(255, 255, 255));
+  struct nk_rect text_pos = {n->bound.x + 5, n->bound.y, n->bound.w,
+                             n->bound.h};
+  nk_draw_text(buf, text_pos, n->inner_text, strlen(n->inner_text),
+               ctx->style.font, nk_rgb(255, 0, 0), nk_rgb(0, 255, 0));
+}
+
+static inline void _draw_curve(struct nk_context *ctx, node_s *n, node_s *n2) {
+  struct nk_command_buffer *buf = nk_window_get_canvas(ctx);
+  struct nk_vec2 l0 =
+      nk_vec2(n->bound.x + n->bound.w / 2, n->bound.y + n->bound.h / 2);
+  struct nk_vec2 l1 =
+      nk_vec2(n2->bound.x + n2->bound.w / 2, n2->bound.y + n2->bound.h / 2);
+
+  nk_stroke_curve(buf, l0.x, l0.y, l0.x + 50.0f, l0.y, l1.x - 50.0f, l1.y, l1.x,
+                  l1.y, 1.0f, nk_rgb(100, 100, 100));
 }
 
 static inline node_s _create_node(struct nk_style *style,
                                   const char *inner_text) {
   return (node_s){xstrndup(inner_text, strlen(inner_text)),
-                  {0},
                   (struct nk_rect){0.0f, 0.0f,
                                    _get_text_width(style, inner_text) + 10.0f,
                                    style->font->height},
-                  uid++,
-                  0,
                   {0}};
 }
 
-static node_s *_is_node_exist(const char *name) {
+static node_s *_get_node_with_name(const char *name) {
   node_s *n = NULL;
   for (size_t i = 0; i < arr_node_size(nodes); ++i) {
     if (strncmp(name, arr_node_get(nodes, i)->inner_text, strlen(name)) == 0)
@@ -105,17 +115,31 @@ static node_s *_is_node_exist(const char *name) {
 
 void cgrf_calculate_node_pos(struct nk_style *style, struct array_str_s *toks) {
   srand(time(NULL));
-  for (size_t i = 0; i < array_str_size(toks); ++i) {
-    node_s n = _create_node(style, *array_str_get(toks, i));
+
+  for (size_t k = 0; k < array_str_size(toks); k++) {
+    if (k != 0) {
+      for (size_t n = 0; n < array_str_size(visited_nodes); n++) {
+        if (strncmp(*array_str_get(visited_nodes, n), *array_str_get(toks, k),
+                    strlen(*array_str_get(toks, k))) == 0) {
+          goto skip;
+        }
+      }
+    }
+    array_str_push_back(visited_nodes, *array_str_get(toks, k));
+  skip:
+    while (0) /* Just dummy code to skip outter for-loop */
+      ;
+  }
+
+  for (size_t i = 0; i < array_str_size(visited_nodes); i++) {
+    node_s n = _create_node(style, *array_str_get(visited_nodes, i));
     n.bound.x = SDL_clamp(rand() % width, 0.0f, width - 50.0f);
     n.bound.y = SDL_clamp(rand() % height, 0.0f, height - 50.0f);
     arr_node_push_back(nodes, n);
   }
-  for (size_t i = 0; i < arr_node_size(nodes); ++i)
-    printf("%s\n", arr_node_get(nodes, i)->inner_text);
-  for (size_t i = 0; i < arr_node_size(nodes) - 1; ++i) {
-    node_s *n = arr_node_get(nodes, i);
-    n->conns[n->conn_num++] = arr_node_get(nodes, i + 1)->id;
+  if (arr_node_empty_p(nodes)) {
+    perror("Specified file is empty!");
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -124,33 +148,25 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
   struct nk_input *in = &ctx->input;
   if (nk_begin(ctx, "Graph Viewer", nk_rect(0, 0, width, height),
                NK_WINDOW_NO_SCROLLBAR)) {
-    struct nk_command_buffer *canvas = nk_window_get_canvas(ctx);
     struct nk_rect total_space = nk_window_get_content_region(ctx);
-    nk_layout_space_begin(ctx, NK_STATIC, total_space.h,
-                          array_str_size(toks) * 2);
+    nk_layout_space_begin(ctx, NK_STATIC, total_space.h, array_str_size(toks));
 
     _draw_grid(ctx, scrolling, 30.0f, nk_rgb(60, 60, 60));
-
     struct nk_rect bounds;
-    for (size_t i = 0; i < arr_node_size(nodes); ++i) {
-      node_s *n = arr_node_get(nodes, i);
-      node_s *n1 = NULL;
-      if (i + 1 < arr_node_size(nodes))
-        n1 = arr_node_get(nodes, i + 1);
-      else
-        n1 = arr_node_get(nodes, i);
 
-      struct nk_vec2 l0 =
-          nk_vec2(n->bound.x + n->bound.w / 2, n->bound.y + n->bound.h / 2);
-      struct nk_vec2 l1 =
-          nk_vec2(n1->bound.x + n1->bound.w / 2, n1->bound.y + n1->bound.h / 2);
-
-      nk_stroke_curve(canvas, l0.x, l0.y, l0.x + 50.0f, l0.y, l1.x - 50.0f,
-                      l1.y, l1.x, l1.y, 1.0f, nk_rgb(100, 100, 100));
+    for (size_t i = 0; i < array_str_size(toks); i += 2) {
+      node_s *n = _get_node_with_name(*array_str_get(toks, i));
+      node_s *n2 = _get_node_with_name(*array_str_get(toks, i + 1));
 
       nk_layout_space_push(ctx, nk_rect(n->bound.x - scrolling.x,
                                         n->bound.y - scrolling.y, n->bound.w,
                                         n->bound.h));
+
+      nk_layout_space_push(ctx, nk_rect(n2->bound.x - scrolling.x,
+                                        n2->bound.y - scrolling.y, n2->bound.w,
+                                        n2->bound.h));
+
+      _draw_curve(ctx, n, n2);
 
       if (nk_input_is_mouse_hovering_rect(in, nk_window_get_bounds(ctx)) &&
           nk_input_is_mouse_down(in, NK_BUTTON_MIDDLE)) {
@@ -158,13 +174,11 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
         bounds.x -= SDL_clamp(scrolling.x, -0.5f, 0.5f);
         bounds.y -= SDL_clamp(scrolling.y, -0.5f, 0.5f);
         n->bound = nk_layout_space_rect_to_screen(ctx, bounds);
+        n2->bound = nk_layout_space_rect_to_screen(ctx, bounds);
       }
 
-      _draw_circle(canvas, n, nk_rgb(25, 25, 25));
-      struct nk_rect text_pos = {n->bound.x + 5, n->bound.y, n->bound.w,
-                                 n->bound.h};
-      nk_draw_text(canvas, text_pos, n->inner_text, strlen(n->inner_text),
-                   ctx->style.font, nk_rgb(255, 0, 0), nk_rgb(0, 255, 0));
+      _draw_node(ctx, n, nk_rgb(25, 25, 25));
+      _draw_node(ctx, n2, nk_rgb(25, 25, 25));
     }
 
     if (nk_input_is_mouse_hovering_rect(in, nk_window_get_bounds(ctx)) &&
