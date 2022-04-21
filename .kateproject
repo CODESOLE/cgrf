@@ -1,5 +1,5 @@
 {
-  "name": "Kate",
+  "name": "cgrf",
   "files": [
     {
       "git": 1
@@ -7,7 +7,7 @@
   ],
   "build": {
     "directory": "build",
-    "build": "make all",
+    "build": "./build.sh",
     "clean": "make clean",
     "install": "make install"
   }
