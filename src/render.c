@@ -170,10 +170,14 @@ void cgrf_render_graph(struct nk_context *ctx, struct array_str_s *toks) {
 
       if (nk_input_is_mouse_hovering_rect(in, nk_window_get_bounds(ctx)) &&
           nk_input_is_mouse_down(in, NK_BUTTON_MIDDLE)) {
+        const float clamp_amount = 0.5f;
         bounds = nk_layout_space_rect_to_local(ctx, n->bound);
-        bounds.x -= SDL_clamp(scrolling.x, -0.5f, 0.5f);
-        bounds.y -= SDL_clamp(scrolling.y, -0.5f, 0.5f);
+        bounds.x -= SDL_clamp(scrolling.x, -clamp_amount, clamp_amount);
+        bounds.y -= SDL_clamp(scrolling.y, -clamp_amount, clamp_amount);
         n->bound = nk_layout_space_rect_to_screen(ctx, bounds);
+        bounds = nk_layout_space_rect_to_local(ctx, n2->bound);
+        bounds.x -= SDL_clamp(scrolling.x, -clamp_amount, clamp_amount);
+        bounds.y -= SDL_clamp(scrolling.y, -clamp_amount, clamp_amount);
         n2->bound = nk_layout_space_rect_to_screen(ctx, bounds);
       }
 
