@@ -6,9 +6,7 @@
     }
   ],
   "build": {
-    "directory": "build",
     "build": "./build.sh",
-    "clean": "make clean",
-    "install": "make install"
+    "clean": "rm -rfd build"
   }
 }
