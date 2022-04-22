@@ -7,6 +7,17 @@ A very simple c graph visualization.
 
 ![](https://github.com/CODESOLE/cgrf/blob/main/demo.gif)
 
+# Usage
+```
+Usage: cgrf [OPTION...] [FILE...]
+A simple graph visualization program
+
+--version           print version
+--help              print help
+--file=<filename>   specify file to visualize
+
+```
+
 # Build on Windows
  - Install [MSYS2](https://msys2.org) (Leave installation directory to `C:\msys64`)
  - Open `MSYS2 MSYS` shell from start menu (**NOT `MSYS2 MINGW or others`**)
