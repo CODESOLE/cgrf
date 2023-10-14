@@ -60,7 +60,7 @@ static void _draw_grid(struct nk_context *ctx, const struct nk_rect scrolling,
 typedef struct node {
   const char *inner_text;
   struct nk_rect bound;
-  CGRF_PAD(6);
+  CGRF_PAD(8);
 } node_s;
 
 ARRAY_DEF(arr_node, node_s, M_POD_OPLIST)
